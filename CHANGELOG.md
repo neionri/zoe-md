@@ -2,6 +2,22 @@
 
 Semua perubahan syaraf dan evolusi sistem Zoe dicatat di sini.
 
+## [3.2.0] - Stage: Neural Response & Commercial Matrix 💰🚀⚡
+### Added
+- **Neural Priority Queue**: Sistem antrean global berbasis kasta (VIP > Premium > Free).
+- **Dynamic Debouncing**: Jendela observasi lebih cepat (1.5s) khusus untuk VIP.
+- **Manual Payment Gate**: Perintah `.langganan` untuk monetisasi manual via Owner.
+- **Enhanced Metering**: Tampilan rasio MB dan Stiker di `.me`.
+
+## [3.0.0-Beta] - Stage: Neural Tiering 🧬⚖️💎
+### Added
+- **Neural Social Hierarchy**: Sistem kasta individu (Free, Premium, VIP) berbasis JID.
+- **Quota Management**: Limit harian Downloader (15MB Free / 200MB Premium / No Limit VIP).
+- **Neural Reset (00:00)**: Reset otomatis seluruh kuota harian setiap tengah malam. 🌓🔄
+- **Owner Authority Console**: Perintah .addprem, .addvip, dan .delkasta untuk manajemen manual.
+- **Neural Identity Card**: Perintah .me / .status untuk cek kasta, masa aktif, dan statistik harian.
+- **Structural Resilience**: Pendekatan immutable pada update database kasta untuk presisi data 100%.
+
 ## [2.6.1] - Stage: Global Neural Authority 👑🛰️
 ### Added
 - **Global Command Ban**: Owner sekarang bisa melakukan pemblokiran perintah secara internasional (Global) melalui Private Chat.

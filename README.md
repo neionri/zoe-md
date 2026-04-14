@@ -48,14 +48,18 @@ c:\wa
 │   ├── commands/           # Kumpulan modul perintah bot (Hot-Reloadable)
 │   │   ├── dl.js           # Universal Media Downloader
 │   │   ├── audit.js        # Security Breach Scanner
-│   │   └── sticker.js      # Media to Sticker Converter
+│   │   ├── sticker.js      # Media to Sticker Converter (Tiered)
+│   │   ├── subscribe.js    # Manual Payment & Pricing
+│   │   ├── userStatus.js   # Neural Identity Card (.me)
+│   │   └── userControl.js  # Owner Admin Console
 │   ├── func/               # Engine & Logika Pendukung (Syaraf Pusat)
 │   │   ├── bouncer.js      # Keamanan, Ban, & Spam Moderation
-│   │   ├── downloader.js   # Integration Engine (yt-dlp wrapper)
+│   │   ├── downloader.js   # Integration Engine (Tiered Limits)
 │   │   ├── memory.js       # Hierarchical Memory Management
 │   │   ├── groq.js         # AI Synthesis & Vision logic
-│   │   └── db.js           # MongoDB Core Connection
-│   └── messageHandler.js   # Dispatcher Utama (Lalu lintas pesan)
+│   │   ├── db.js           # MongoDB Core Connection
+│   │   └── priorityQueue.js # Global Priority Path (v3.2.x)
+│   └── messageHandler.js   # Dispatcher Utama (Priority Aware)
 ├── scratch/                # Temporary Storage (Donlot & Voice cache)
 ├── .env                    # Secrets & Config
 └── README.md               # Neural Manual (Lo lagi baca ini)
@@ -97,14 +101,13 @@ npm install
 ### 4. Konfigurasi Sistem (.env)
 Buat file bernama `.env` di direktori utama dan isi dengan data berikut:
 ```env
-GROQ_API_KEY=gsk_xxxx...        # Ambil dari link di langkah 2
-MONGODB_URI=mongodb://...     # Link koneksi MongoDB Anda
-OWNER_NUMBER=628xxxx          # Nomor WA Boss (Tanpa simbol)
-PAIRING_NUMBER=628xxxx        # Nomor yang akan dipakai Zoe
+GROQ_API_KEYS=gsk_key1, gsk_key2  # Multi-key rotation
+MONGODB_URI=mongodb://...         # Link koneksi MongoDB Anda
+OWNER_LID=1400xxx                 # Identitas Master
+OWNER_NAME=BossName               # Nama Master
 ```
 
 ### 5. Menghidupkan Zoe
-Jalankan perintah berikut:
 ```bash
 npm start
 ```
@@ -157,38 +160,28 @@ Pastikan file `.env` Anda terisi dengan benar:
 
 | Key | Description |
 |---|---|
-| `GROQ_API_KEY` | Kunci akses ke otak AI Zoe (Groq Cloud). |
+| `GROQ_API_KEYS` | Kunci akses (Multi-key) ke otak AI Zoe (Groq Cloud). |
 | `MONGODB_URI` | Koneksi database untuk ingatan permanen. |
-| `OWNER_NUMBER` | Nomor WhatsApp master Anda (Tanpa simbol). |
-| `PAIRING_NUMBER` | Nomor yang akan digunakan Zoe untuk login pertama kali. |
-
-> [!NOTE]
-> **Groq Rate Limits**: Jika Anda menggunakan akun Groq gratis, harap perhatikan batas panggilan API (RPM/TPM). Jika Anda melakukan spam percakapan terlalu cepat, Zoe mungkin akan mengalami error *Rate Limit* (429).
+| `OWNER_LID` | Identitas Master WA Anda. |
+| `OWNER_NAME` | Nama panggil Master Anda. |
 
 ---
 
 ## 🛰️ Operational Commands
+
+### 💳 Tiering & Identity
+- **`.me`**: Menampilkan kasta, limit, dan statistik harian.
+- **`.langganan`**: Menampilkan harga evolusi kasta & kontak Owner.
+- **`.addprem / .addvip`**: (Owner Only) Mengatur jenjang kasta user.
 
 ### 📥 Media Download
 - **Usage**: `.dl [URL]`
 - **Targets**: YouTube, TikTok, Instagram (Reels & Feed).
 - **Options**: Video (High Res), Audio (.mp3), atau Dokumen (Raw file).
 
-### 🎨 Creativity
-- **Usage**: `.s` (Balas ke gambar/video)
-- **Result**: Stiker statis atau bergerak (GIF/Video).
-
 ### 🕵️ Neural Logic Audit
 - **Usage**: `.audit [teks]` (atau reply pesan orang lain)
 - **Function**: Membedah teks menggunakan spesialis **Orpheus-v1** untuk mencari kesalahan logika (*Logical Fallacies*) dan membantainya dengan gaya sarkas Zoe.
-
-### 🕰️ Neural Reminder (NLP Support)
-- **Usage**: `.remindme [waktu] [pesan]`
-- **Examples**: 
-  - `.remind 1 jam lagi angkat jemuran`
-  - `.remind jam 4 sore mandi`
-  - `.remind tanggal 3 ada rapat jam 10 pagi`
-- **Function**: Menggunakan spesialis **Chronos-v1** untuk menafsirkan waktu natural dan menjadwalkan pengingat persisten di MongoDB.
 
 ---
 
@@ -200,9 +193,6 @@ Zoe memiliki fitur interaktif di mana dia bisa mengirimkan foto dirinya sendiri 
 1. Buat folder baru bernama `zoe` di direktori utama proyek (`c:\wa\zoe`).
 2. Masukkan foto-foto pilihan Anda ke dalam folder tersebut (format `.jpg`, `.jpeg`, atau `.png`).
 3. Zoe akan secara otomatis melakukan pemotongan (*cropping*) cerdas untuk menyesuaikan aspek rasio WhatsApp (Landscape 1.91:1 atau Legacy Square).
-
-> [!CAUTION]
-> Jangan pernah membagikan isi folder `zoe` Anda jika folder tersebut berisi foto pribadi yang sensitif.
 
 ---
 

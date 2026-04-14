@@ -12,7 +12,7 @@ export const aliases = ['s', 'stiker'];
 export const description = 'Pure FFmpeg Neural Sticker Engine';
 export const category = 'Neural Specialist';
 
-export default async (sock, m, { helper, groq }) => {
+export default async (sock, m, { helper, groq, userConfig }) => {
     const remoteJid = helper.getSender(m);
     const message = m.messages[0];
     const quoted = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
@@ -23,6 +23,27 @@ export default async (sock, m, { helper, groq }) => {
     if (!isImage && !isVideo && !isViewOnce) {
         const refusal = await groq.getZoeDirective("User mau bikin stiker tapi nggak ngasih gambar atau video. Sindir dia biar pinteran sedikit kalo mo nyuruh AI.", remoteJid);
         return await sock.sendMessage(remoteJid, { text: refusal }, { quoted: message });
+    }
+
+    // --- NEURAL TIER CHECK (v3.1.5) ---
+    const tier = userConfig.tier || 'free';
+    const limits = {
+        free: { photo: 20, video: 10 },
+        premium: { photo: 50, video: 25 },
+        vip: { photo: 9999, video: 9999 }
+    };
+    
+    const userLimit = limits[tier];
+    const photoUsed = userConfig.dailyUsage?.get?.('stickerPhoto') || 0;
+    const videoUsed = userConfig.dailyUsage?.get?.('stickerVideo') || 0;
+
+    if (isImage && photoUsed >= userLimit.photo) {
+        const res = await groq.getZoeDirective(`User kasta ${tier.toUpperCase()} limit stiker fotonya habis (${userLimit.photo}). Sindir kasta mereka.`, remoteJid);
+        return await sock.sendMessage(remoteJid, { text: `🚫 *Neural Limit*: ${res}` });
+    }
+    if (isVideo && videoUsed >= userLimit.video) {
+        const res = await groq.getZoeDirective(`User kasta ${tier.toUpperCase()} limit stiker videonya habis (${userLimit.video}). Sindir kasta mereka.`, remoteJid);
+        return await sock.sendMessage(remoteJid, { text: `🚫 *Neural Limit*: ${res}` });
     }
 
     // Setup folder kerja
@@ -78,7 +99,17 @@ export default async (sock, m, { helper, groq }) => {
 
         // 4. DISPATCH
         await sock.sendMessage(remoteJid, { sticker: finalSticker }, { quoted: message });
-        helper.coolLog('SUCCESS', 'Neural Sticker (Method 3) dispatched successfully.');
+        
+        // --- UPDATE USAGE (v3.1.5) ---
+        const { updateUserConfig } = await import('../func/memory.js');
+        const updateKey = isImage ? 'stickerPhoto' : 'stickerVideo';
+        const currentCount = (userConfig.dailyUsage?.get?.(updateKey) || 0) + 1;
+
+        await updateUserConfig(helper.getParticipant(m), {
+            [`dailyUsage.${updateKey}`]: currentCount
+        });
+
+        helper.coolLog('SUCCESS', `Neural Sticker dispatched. Metric: ${updateKey} -> ${currentCount}`);
 
     } catch (error) {
         console.error('Neural Engine Failure (Method 3):', error);

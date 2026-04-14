@@ -56,7 +56,7 @@ function watchRecursive(dir, callback) {
  */
 function validateNeuralPulse() {
     const groqKey = process.env.GROQ_API_KEY || process.env.GROQ_API_KEYS;
-    const required = ['MONGODB_URI', 'OWNER_NUMBER'];
+    const required = ['MONGODB_URI', 'OWNER_LID'];
     const missing = required.filter(key => !process.env[key]);
 
     if (!groqKey) missing.push('GROQ_API_KEY');

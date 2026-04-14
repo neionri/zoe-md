@@ -39,7 +39,7 @@ export function createSession(jid, url, platform) {
 /**
  * Handle Pilihan User (1, 2, 3, 4)
  */
-export async function handleChoice(sock, m, helper, groq) {
+export async function handleChoice(sock, m, helper, groq, userConfig) {
     const remoteJid = helper.getSender(m);
     const session = global.dlSessions.get(remoteJid);
     if (!session) return false;
@@ -65,14 +65,14 @@ export async function handleChoice(sock, m, helper, groq) {
 
     // Proses Download
     global.dlSessions.delete(remoteJid); // Bersihkan sesi segera setelah pilihan valid diterima
-    await executeDownload(sock, m, session.url, type, helper, groq);
+    await executeDownload(sock, m, session.url, type, helper, groq, userConfig);
     return true;
 }
 
 /**
  * Eksekusi Download menggunakan youtube-dl-exec (Powered by yt-dlp)
  */
-async function executeDownload(sock, m, url, type, helper, groq) {
+async function executeDownload(sock, m, url, type, helper, groq, userConfig) {
     const remoteJid = helper.getSender(m);
     const timestamp = Date.now();
     const outputBase = path.join(tempDir, `dl_${timestamp}`);
@@ -122,10 +122,20 @@ async function executeDownload(sock, m, url, type, helper, groq) {
         
         const filePath = path.join(tempDir, fileName);
         const stats = fs.statSync(filePath);
+        const fileSizeMB = stats.size / (1024 * 1024);
 
-        if (stats.size > 50 * 1024 * 1024) { // Limit 50MB
-             throw new Error("File-nya kegedean boss (di atas 50MB). Zoe nggak kuat ngirimnya lewat WA.");
+        // PENGECEKAN LIMIT KASTA (v3.0.0-Beta)
+        const tier = userConfig.tier || 'free';
+        const limits = { free: 15, premium: 200, vip: 999999 };
+        const userLimit = limits[tier];
+
+        if (fileSizeMB > userLimit) {
+            fs.unlinkSync(filePath); // Hapus file biar nggakuh menuhin disk
+            const limitRes = await groq.getZoeDirective(`User kasta ${tier.toUpperCase()} nyoba download file ${fileSizeMB.toFixed(1)}MB padahal limitnya cuma ${userLimit}MB. Sindir kasta mereka pake gaya lo yang elit.`, remoteJid);
+            return await sock.sendMessage(remoteJid, { text: `🚫 *Neural Limit*: ${limitRes}` });
         }
+
+        // Jalankan pengiriman jika lolos sensor
 
         // Kirim Media
         const ext = path.extname(filePath);
@@ -143,6 +153,14 @@ async function executeDownload(sock, m, url, type, helper, groq) {
                 mimetype: ext === '.mp4' ? 'video/mp4' : (ext === '.mp3' ? 'audio/mpeg' : 'application/octet-stream') 
             }, { quoted: m.messages[0] });
         }
+
+        // Catat Penggunaan (Database)
+        const { updateUserConfig } = await import('./memory.js');
+        const currentMB = (userConfig.dailyUsage?.get?.('downloadMB') || 0) + fileSizeMB;
+        
+        await updateUserConfig(helper.getParticipant(m), {
+            [`dailyUsage.downloadMB`]: parseFloat(currentMB.toFixed(2))
+        });
 
         // Cleanup
         setTimeout(() => {

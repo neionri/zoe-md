@@ -17,13 +17,14 @@
  */
 async function getHelpers() {
     const timestamp = Date.now();
-    const [helper, memory, groq, imageHelper] = await Promise.all([
+    const [helper, memory, groq, imageHelper, queue] = await Promise.all([
         import(`./func/helper.js?t=${timestamp}`),
         import(`./func/memory.js?t=${timestamp}`),
         import(`./func/groq.js?t=${timestamp}`),
-        import(`./func/imageHelper.js?t=${timestamp}`)
+        import(`./func/imageHelper.js?t=${timestamp}`),
+        import(`./func/priorityQueue.js?t=${timestamp}`)
     ]);
-    return { helper, memory, groq, imageHelper };
+    return { helper, memory, groq, imageHelper, queue };
 }
 
 /**
@@ -58,39 +59,54 @@ export async function handleMessage(sock, m) {
     // Auto-Read instan
     await sock.readMessages([m.messages[0].key]);
 
-    // 2. LOGIKA NEURAL ACCUMULATOR (Debouncing)
-    // Ambil atau buat antrian untuk user ini
+    // 2. LOGIKA NEURAL ACCUMULATOR (Dynamic Debouncing v3.2.0)
+    // Identifikasi Kasta Sedini Mungkin
+    const participantJid = helper.getParticipant(m);
+    const { memory, queue: nQueue } = await getHelpers();
+    const userConfig = await memory.getUserConfig(participantJid);
+    const tier = userConfig.tier || 'free';
+
+    // VIP dapet jendela observasi lebih kenceng (1.5 detik)
+    const debounceTime = tier === 'vip' ? 1500 : 3000;
+
     if (!global.neuralQueues.has(remoteJid)) {
         global.neuralQueues.set(remoteJid, {
             messages: [],
             timer: null,
-            lastM: m // Simpan referensi pesan terakhir untuk quoted context
+            lastM: m
         });
     }
 
     const queue = global.neuralQueues.get(remoteJid);
-    
-    // Simpan pesan ke dalam bak penampung
     queue.messages.push(m);
     queue.lastM = m;
 
-    // Reset Timer (Neural Window: 3 Detik)
     if (queue.timer) clearTimeout(queue.timer);
     
-    helper.coolLog('PRESENCE', `Accumulating thought for ${remoteJid.split('@')[0]}... (Total: ${queue.messages.length})`);
+    helper.coolLog('PRESENCE', `Accumulating thought for ${remoteJid.split('@')[0]}... [Debounce: ${debounceTime}ms]`);
     
     queue.timer = setTimeout(async () => {
         try {
             const batch = [...queue.messages];
             const lastM = queue.lastM;
-            global.neuralQueues.delete(remoteJid); // Bersihkan antrian setelah diproses
+            global.neuralQueues.delete(remoteJid);
             
-            await _executeNeuralLogic(sock, lastM, batch);
+            // Masukkan ke Antrean Prioritas Global alih-alih eksekusi langsung
+            nQueue.enqueueNeuralTask({
+                remoteJid,
+                tier,
+                m: lastM,
+                batch,
+                execute: async () => {
+                    await _executeNeuralLogic(sock, lastM, batch, userConfig);
+                }
+            });
+
         } catch (err) {
             console.error('[NeuralAccumulator] Fatal Error:', err);
             global.neuralQueues.delete(remoteJid);
         }
-    }, 3000); // Tunggu 3 detik sebelum mulai "berpikir"
+    }, debounceTime);
 }
 
 /**
@@ -98,16 +114,32 @@ export async function handleMessage(sock, m) {
  * Menjalankan seluruh logika Zoe (Bouncer, Identity, AI Synthesis) 
  * terhadap kumpulan pesan yang sudah diakumulasi.
  */
-async function _executeNeuralLogic(sock, m, batch) {
+async function _executeNeuralLogic(sock, m, batch, existingConfig) {
     // 1. Muat Helper Dinamis (Hot-Reload)
     const { helper, memory, groq, imageHelper } = await getHelpers();
     const remoteJid = helper.getSender(m);
 
-    // 1.5. CEK SESI DOWNLOAD AKTIF (Session Interceptor)
+    // 1.5. KONSOLIDASI IDENTITAS & KASTA
+    const participantJid = helper.getParticipant(m);
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Gunakan config yang sudah ada atau fetch ulang jika tidak ada
+    let userConfig = existingConfig || await memory.getUserConfig(participantJid);
+    
+    // Neural Reset (00:00)
+    if (userConfig.lastReset !== today) {
+        userConfig = await memory.updateUserConfig(participantJid, { 
+            dailyUsage: new Map(),
+            lastReset: today 
+        });
+        helper.coolLog('MEMORY', `Neural reset complete for ${participantJid.split('@')[0]}`);
+    }
+
+    // 1.6. CEK SESI DOWNLOAD AKTIF (Session Interceptor)
     try {
         const timestamp = Date.now();
         const { handleChoice } = await import(`./func/downloader.js?t=${timestamp}`);
-        const isSessionHandled = await handleChoice(sock, m, helper, groq);
+        const isSessionHandled = await handleChoice(sock, m, helper, groq, userConfig);
         if (isSessionHandled) {
             helper.coolLog('SYSTEM', 'Neural Synapse: Download Session intercepted.');
             return;
@@ -195,9 +227,8 @@ async function _executeNeuralLogic(sock, m, batch) {
 
     helper.coolLog('NETWORK', `Processing batch of ${batch.length} synapses from ${remoteJid.split('@')[0]}`);
 
-    const participantJid = helper.getParticipant(m);
     const participantNumber = participantJid.split('@')[0].split(':')[0]; 
-    const ownerNumber = (process.env.OWNER_NUMBER || '').replace(/[^\d]/g, '');
+    const ownerNumber = (process.env.OWNER_LID || '').replace(/[^\d]/g, '');
     const ownerLid = helper.jidNormalize(process.env.OWNER_LID);
 
     // Otentikasi Owner: Berdasarkan nomor HP atau identitas LID
@@ -280,7 +311,7 @@ async function _executeNeuralLogic(sock, m, batch) {
                 try {
                     startProcessing(remoteJid); 
                     await sock.sendPresenceUpdate('composing', remoteJid);
-                    await cmd.run(sock, m, { command, args, helper, memory, groq, imageHelper, isOwner, isGroup });
+                    await cmd.run(sock, m, { command, args, helper, memory, groq, imageHelper, isOwner, isGroup, userConfig });
                 } catch (error) { console.error('Cmd Error:', error); }
                 finally { 
                     stopProcessing(remoteJid); 

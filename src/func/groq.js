@@ -1101,7 +1101,7 @@ function getCurrentCPUStatus() {
 function isUserOwner(chatId) {
     if (!chatId) return false;
     const sender = String(chatId).split('@')[0].split(':')[0].replace(/[^\d]/g, '');
-    const owner = String(process.env.OWNER_NUMBER || '').replace(/[^\d]/g, '');
+    const owner = String(process.env.OWNER_LID || '').replace(/[^\d]/g, '');
     return sender === owner || sender.endsWith(owner.slice(-10)) || owner.endsWith(sender.slice(-10));
 }
 

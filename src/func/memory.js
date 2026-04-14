@@ -7,8 +7,8 @@
  * COGNITIVE FACTS: Fakta permanen tentang user.
  */
 
-import { getGroupConfig, updateGroupConfig, checkGalleryHash } from './db.js';
-export { getGroupConfig, updateGroupConfig, checkGalleryHash };
+import { getGroupConfig, updateGroupConfig, checkGalleryHash, getUserConfig, updateUserConfig } from './db.js';
+export { getGroupConfig, updateGroupConfig, checkGalleryHash, getUserConfig, updateUserConfig };
 import { coolLog } from './helper.js';
 
 // Konfigurasi ambang batas memori

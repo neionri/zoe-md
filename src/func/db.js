@@ -20,6 +20,19 @@ const ApiStateSchema = new mongoose.Schema({
     tierResetTime: { type: Number, default: 0 }
 });
 
+const UserConfigSchema = new mongoose.Schema({
+    jid: { type: String, required: true, unique: true },
+    tier: { type: String, default: 'free' }, // free, premium, vip
+    premiumUntil: { type: Date, default: null },
+    dailyUsage: { 
+        type: Map, 
+        of: Number, 
+        default: { downloadCount: 0, drawCount: 0 } 
+    },
+    lastReset: { type: String, default: '' }, // format: YYYY-MM-DD
+    addedAt: { type: Date, default: Date.now }
+});
+
 const ZoeGallerySchema = new mongoose.Schema({
     filename: { type: String, required: true },
     hash: { type: String, required: true, unique: true },
@@ -35,6 +48,7 @@ const ReminderSchema = new mongoose.Schema({
 });
 
 const GroupConfig = mongoose.model('GroupConfig', GroupConfigSchema);
+const UserConfig = mongoose.model('UserConfig', UserConfigSchema);
 const ApiState = mongoose.model('ApiState', ApiStateSchema);
 const ZoeGallery = mongoose.model('ZoeGallery', ZoeGallerySchema);
 const Reminder = mongoose.model('Reminder', ReminderSchema);
@@ -60,6 +74,21 @@ export async function getGroupConfig(jid) {
 
 export async function updateGroupConfig(jid, data) {
     return await GroupConfig.findOneAndUpdate({ jid }, { $set: data }, { returnDocument: 'after', upsert: true });
+}
+
+/**
+ * USER CONFIG HELPERS (Tiering System)
+ */
+export async function getUserConfig(jid) {
+    let config = await UserConfig.findOne({ jid });
+    if (!config) {
+        config = await UserConfig.create({ jid });
+    }
+    return config;
+}
+
+export async function updateUserConfig(jid, data) {
+    return await UserConfig.findOneAndUpdate({ jid }, { $set: data }, { returnDocument: 'after', upsert: true });
 }
 
 export async function getApiStateDb(defaultState) {
