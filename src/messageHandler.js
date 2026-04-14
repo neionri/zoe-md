@@ -251,21 +251,39 @@ async function _executeNeuralLogic(sock, m, batch) {
     }
 
     // 6. COMMAND EXECUTION (Cek apakah ada command di kumpulan pesan)
-    // Mencari command di baris pertama atau baris manapun dari batch
     const cmdLines = String(combinedText || "").split('\n');
     for (const line of cmdLines) {
         if (helper.isCommand(line)) {
             const { command, args } = helper.parseCommand(line);
             if (global.zoeCommands && global.zoeCommands.has(command)) {
+                // 6.1. LOCKDOWN FILTER (Stage 2.6.1 - Global & Local Check)
+                const globalConfig = await memory.getGroupConfig('GLOBAL');
+                const globalBanned = globalConfig.bannedCommands || [];
+                const localBanned = config.bannedCommands || [];
+                
+                const isGloballyBanned = globalBanned.includes(command);
+                const isLocallyBanned = isGroup && localBanned.includes(command);
+
+                if ((isGloballyBanned || isLocallyBanned) && !isOwner) {
+                    const scope = isGloballyBanned ? "seluruh Matrix (GLOBAL)" : "grup ini";
+                    const savageReplies = [
+                        `Woi, baca aturan! Perintah .${command} ini lagi di-lockdown di ${scope}. Lu kira ini warnet gratisan?`,
+                        `Denger ya rakyat jelata, perintah .${command} ini sudah dilarang di ${scope}. Jangan maksa, nanti gue kick baru tau rasa.`,
+                        `Sistem lagi galak, perintah .${command} dimatiin untuk ${scope}. Lu mending diem aja daripada gue roasting sampe mental kena.`,
+                        `Gue nggak bakal jalanin .${command} selama masih ada lockdown untuk ${scope}. Lu siapa nyuruh-nyuruh gue?`
+                    ];
+                    return await sock.sendMessage(remoteJid, { text: `🚫 *Neural Lockdown*: ${savageReplies[Math.floor(Math.random() * savageReplies.length)]}` });
+                }
+
                 const cmd = global.zoeCommands.get(command);
                 await memory.addMessage(remoteJid, 'user', combinedText);
                 try {
-                    startProcessing(remoteJid); // Tandai proses aktif
+                    startProcessing(remoteJid); 
                     await sock.sendPresenceUpdate('composing', remoteJid);
-                    await cmd.run(sock, m, { args, helper, memory, groq, imageHelper, isOwner, isGroup });
+                    await cmd.run(sock, m, { command, args, helper, memory, groq, imageHelper, isOwner, isGroup });
                 } catch (error) { console.error('Cmd Error:', error); }
                 finally { 
-                    stopProcessing(remoteJid); // Bersihkan status proses
+                    stopProcessing(remoteJid); 
                     startOfflineTimer(); 
                 }
                 return;

@@ -2,6 +2,20 @@
 
 Semua perubahan syaraf dan evolusi sistem Zoe dicatat di sini.
 
+## [2.6.1] - Stage: Global Neural Authority 👑🛰️
+### Added
+- **Global Command Ban**: Owner sekarang bisa melakukan pemblokiran perintah secara internasional (Global) melalui Private Chat.
+- **Private Chat Defense**: Zoe akan me-roasting siapapun (non-owner) yang mencoba mengakses perintah moderasi di Private Chat. 😂🔥
+- **Tiered Filtering Logic**: Sistem pengecekan ganda (Global vs Local) di MessageHandler untuk memastikan aturan Owner selalu di atas aturan Admin Grup.
+- **Dynamic Scoping**: Respon sarkas ban sekarang dinamis menyebutkan apakah perintah dilarang di "Grup ini" atau "Seluruh Matrix (Global)".
+
+## [2.6.0] - Stage: Command Moderation 🛡️🔐
+### Added
+- **Neural Command Moderation**: Sistem cekal perintah spesifik per grup (.bcmd, .ubcmd, .listbcmd).
+- **Savage Enforcement**: Respon AI sarkas yang menyakitkan saat member mencoba menjalankan perintah terlarang. 🔒🔥
+- **Admin-Only Authority**: Integrasi validasi Admin Grup & Owner untuk akses kontrol penuh.
+- **Context Awareness**: Upgrade MessageHandler untuk menyalurkan nama perintah asli ke dalam eksekusi modul (Dukungan Alias Cerdas).
+
 ## [2.5.18] - Stage: Identity Evolution 🎭🧬
 ### Added
 - **Neural Selective Attention**: Bot sekarang hanya merespon di grup jika di-reply, di-mention, atau dipanggil namanya. 🛡️🔐

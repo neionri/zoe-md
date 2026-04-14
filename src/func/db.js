@@ -8,6 +8,7 @@ const GroupConfigSchema = new mongoose.Schema({
     summary: { type: String, default: '' },
     facts: { type: Array, default: [] },
     bouncerMode: { type: Boolean, default: false },
+    bannedCommands: { type: Array, default: [] },
     lastPapTime: { type: Date },
     lastActive: { type: Date, default: Date.now }
 });
