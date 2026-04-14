@@ -1,0 +1,27 @@
+services:
+  zoe-agent:
+    build: .
+    container_name: zoe-neural-agent
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+    volumes:
+      - ./zoe:/app/zoe
+      - ./media:/app/media
+      - ./auth_info:/app/auth_info
+      - ./scratch:/app/scratch
+
+  mongo:
+    image: mongo:latest
+    container_name: zoe-mongodb
+    restart: always
+    # Menghubungkan port ke luar agar bisa diakses GUI (Compass) jika perlu
+    ports:
+      - "27017:27017"
+    volumes:
+      - zoe-db-data:/data/db
+
+volumes:
+  zoe-db-data:

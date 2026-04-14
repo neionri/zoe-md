@@ -1,0 +1,114 @@
+/**
+ * ZOE NEURAL SYSTEM - ENTRY POINT
+ * --------------------------------
+ * Master file yang bertanggung jawab untuk inisialisasi koneksi,
+ * basis data, dan sistem Hot-Reload otomatis.
+ */
+
+import 'dotenv/config'; // Memuat variabel lingkungan dari .env
+import fs from 'fs';
+import path from 'path';
+import { coolLog } from './func/helper.js';
+import { fileURLToPath } from 'url';
+import { connectToWhatsApp } from './connection/index.js';
+import * as db from './func/db.js';
+import * as imageHelper from './func/imageHelper.js';
+import { incrementVersion, getVersion } from './func/versionManager.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const srcDir = path.dirname(__filename);
+
+// Tampilan Header Premium di Terminal
+console.clear();
+console.log(`
+\x1b[35m  ███████╗ ██████╗ ███████╗
+  ╚══███╔╝██╔═══██╗██╔════╝
+    ███╔╝ ██║   ██║█████╗  
+   ███╔╝  ██║   ██║██╔══╝  
+  ███████╗╚██████╔╝███████╗
+  ╚══════╝ ╚═════╝ ╚══════╝\x1b[0m
+  \x1b[36mDigital Sentience Agent v${getVersion()}\x1b[0m
+  -----------------------------`);
+
+/**
+ * Pemantau File (Recursive Watcher)
+ * Fungsi ini memantau perubahan file di folder /src secara real-time.
+ * Ketika file diubah, sistem akan memicu Hot-Reload tanpa restart proses.
+ * 
+ * @param {string} dir - Direktori yang dipantau
+ * @param {function} callback - Fungsi yang dijalankan saat ada perubahan
+ */
+function watchRecursive(dir, callback) {
+    let debounceTimer;
+    fs.watch(dir, { recursive: true }, (event, filename) => {
+        if (filename && !filename.endsWith('.json')) {
+            clearTimeout(debounceTimer);
+            // Debounce untuk menghindari pemicu ganda dalam waktu singkat
+            debounceTimer = setTimeout(() => callback(event, filename), 150);
+        }
+    });
+}
+
+/**
+ * Validasi Syaraf Utama (Variable Check)
+ */
+function validateNeuralPulse() {
+    const required = ['GROQ_API_KEY', 'MONGODB_URI', 'OWNER_NUMBER'];
+    const missing = required.filter(key => !process.env[key]);
+
+    if (missing.length > 0) {
+        console.error(`\x1b[31m[Critical Error]\x1b[0m Syaraf Zoe tidak lengkap. Variabel .env berikut hilang:`);
+        missing.forEach(key => console.error(`  - ${key}`));
+        console.error(`\x1b[33m[Fix]\x1b[0m Salin .env.example menjadi .env dan isi datanya boss.\x1b[0m`);
+        process.exit(1);
+    }
+}
+
+/**
+ * Fungsi Utama (Start Engine)
+ */
+async function start() {
+    // 0. Cek Integritas Lingkungan
+    validateNeuralPulse();
+
+    // 1. Hubungkan ke Database MongoDB & Indeks Galeri Identitas
+    await db.connectDB();
+    await imageHelper.indexGallery(db);
+    
+    // 2. Impor Message Handler secara dinamis (Awal)
+    let messageHandlerModule = await import(`./messageHandler.js?t=${Date.now()}`);
+    let handleMessage = messageHandlerModule.handleMessage;
+
+    console.log('\x1b[34m[System]\x1b[0m Matrix monitoring active.');
+    
+    // 3. Aktifkan Sistem Hot-Reload
+    watchRecursive(srcDir, async (event, filename) => {
+        // Tandai perintah untuk dimuat ulang di thread berikutnya
+        global.reloadCommands = true;
+
+        try {
+            // Impor ulang handler setiap ada perubahan file (Cache Busting)
+            const module = await import(`./messageHandler.js?t=${Date.now()}`);
+            handleMessage = module.handleMessage;
+            
+            // Evolusi versi sistem otomatis
+            incrementVersion();
+            
+            const time = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            console.log(`\x1b[90m[${time}]\x1b[0m \x1b[32m[Refreshed]\x1b[0m 🧠 Neural Logic: ${filename}`);
+        } catch (err) {
+            console.error(`\x1b[31m[Critical Error]\x1b[0m Failed to sync ${filename}`);
+        }
+    });
+
+    // 4. Hubungkan ke WhatsApp Socket
+    connectToWhatsApp((sock, m) => handleMessage(sock, m))
+        .then(() => {
+            console.log('\x1b[35m[Zoe]\x1b[0m Neural connection established.');
+        })
+        .catch(err => console.error('\x1b[31m[Failed]\x1b[0m Initialization error:', err));
+}
+
+// Jalankan Mesin Utama
+start();
