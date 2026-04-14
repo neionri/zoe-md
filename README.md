@@ -182,6 +182,14 @@ Pastikan file `.env` Anda terisi dengan benar:
 - **Usage**: `.audit [teks]` (atau reply pesan orang lain)
 - **Function**: Membedah teks menggunakan spesialis **Orpheus-v1** untuk mencari kesalahan logika (*Logical Fallacies*) dan membantainya dengan gaya sarkas Zoe.
 
+### 🕰️ Neural Reminder (NLP Support)
+- **Usage**: `.remindme [waktu] [pesan]`
+- **Examples**: 
+  - `.remind 1 jam lagi angkat jemuran`
+  - `.remind jam 4 sore mandi`
+  - `.remind tanggal 3 ada rapat jam 10 pagi`
+- **Function**: Menggunakan spesialis **Chronos-v1** untuk menafsirkan waktu natural dan menjadwalkan pengingat persisten di MongoDB.
+
 ---
 
 ## 📸 Visual Identity (PAP Engine)

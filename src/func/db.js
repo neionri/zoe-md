@@ -25,9 +25,18 @@ const ZoeGallerySchema = new mongoose.Schema({
     addedAt: { type: Date, default: Date.now }
 });
 
+const ReminderSchema = new mongoose.Schema({
+    jid: { type: String, required: true },
+    sender: { type: String },
+    message: { type: String, required: true },
+    timestamp: { type: Number, required: true },
+    addedAt: { type: Date, default: Date.now }
+});
+
 const GroupConfig = mongoose.model('GroupConfig', GroupConfigSchema);
 const ApiState = mongoose.model('ApiState', ApiStateSchema);
 const ZoeGallery = mongoose.model('ZoeGallery', ZoeGallerySchema);
+const Reminder = mongoose.model('Reminder', ReminderSchema);
 
 export async function connectDB() {
     if (mongoose.connection.readyState >= 1) return;
@@ -81,4 +90,20 @@ export async function checkGalleryHash(hash) {
 
 export async function clearGallery() {
     return await ZoeGallery.deleteMany({});
+}
+
+/**
+ * REMINDER HELPERS
+ */
+export async function saveReminder(jid, sender, message, timestamp) {
+    return await Reminder.create({ jid, sender, message, timestamp });
+}
+
+export async function getDueReminders() {
+    const now = Date.now();
+    return await Reminder.find({ timestamp: { $lte: now } });
+}
+
+export async function deleteReminder(id) {
+    return await Reminder.findByIdAndDelete(id);
 }

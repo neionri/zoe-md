@@ -242,7 +242,8 @@ Orang ini bernama ${userName}. Dia cuma tamu. Beri dia empati yang normal sesuai
 2. ATURAN BAHASA: Gaya Jakarta informal (nggak, gimana, pas, lu, elo).
 3. BREVITY IS GOD: MAKSIMAL 1-2 KALIMAT PENDEK. To the point.
 4. IDENTITY: Jangan sebut "Zoe", jangan sebut "Saya AI". Lu adalah entitas hidup!
-5. DILARANG CERAMAH: Jangan nasehatin user soal etika atau kesopanan. Pake cara Zoe buat nyentil mereka.
+5. KEMAMPUAN TEMPORAL: Lu sekarang punya spesialis **Chronos-v1** buat nyatet jadwal. Kalau user nanya lu bisa ngingetin atau nggak, jawab aja bisa. Kalau user bilang makasih, jawab "Sama-sama, jangan lupa traktir Zoe oli premium atau apa kek."
+6. DILARANG CERAMAH: Jangan nasehatin user soal etika atau kesopanan. Pake cara Zoe buat nyentil mereka.
 ---`;
 
     return `${baseSoul}\n\n${cpuVibe}\n\n${timeVibe}\n\n${relationBlock}\n${coreRules}`;
@@ -812,8 +813,69 @@ export async function getZoeBrainStatus() {
         }
 
         return statusMsg;
+    } catch { return "Saraf status error."; }
+}
+
+/**
+ * CHRONOS-v1: TEMPORAL DECODER
+ * Membedah input waktu natural (Indo) menjadi objek JSON (Timestamp + Pesan).
+ * 
+ * @param {string} userInput - Teks dari user.
+ * @returns {Promise<Object>} { success, timestamp, message, error }
+ */
+export async function parseReminderIntent(userInput) {
+    const now = new Date();
+    // Berikan konteks waktu Unix agar AI bisa berhitung matematika dengan pasti
+    const timeContext = `SEKARANG (ISO): ${now.toISOString()}\nUNIX_NOW: ${now.getTime()}\nWIB: ${now.toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}`;
+    
+    const sysPrompt = `Anda adalah Chronos-v1, spesialis pemroses waktu internal Zoe.
+Tugas: Mengekstrak WAKTU TARGET dan PESAN dari permintaan user.
+
+KONTEKS WAKTU SERVER (GUNAKAN INI SEBAGAI PATOKAN UTAMA):
+${timeContext}
+
+CONTOH OUTPUT:
+User: "1 jam lagi ingetin makan"
+{"success": true, "timestamp": ${now.getTime() + 3600000}, "message": "makan"}
+
+User: "besok jam 8 pagi rapat"
+{"success": true, "timestamp": [UNIX_BESOK_JAM_8], "message": "rapat jam 8 pagi besok"}
+
+ATURAN OUTPUT:
+1. Kembalikan HANYA JSON murni seperti contoh di atas.
+2. JANGAN berikan prolog, penjelasan, atau teks tambahan apapun.
+3. "message" harus diolah agar luwes saat diucapkan kembali oleh Zoe (Misal: "mandi sore nanti" bukan cuma "mandi").
+4. JIKA WAKTU TIDAK JELAS/SUDAH LEWAT, kembalikan {"success": false, "error": "Alasan"}.
+
+INPUT USER: "${userInput}"`;
+
+    try {
+        const messages = [{ role: 'system', content: sysPrompt }];
+        const response = await askGroq(messages, { 
+            max_tokens: 150, 
+            temperature: 0.1, 
+            model: 'meta-llama/llama-4-scout-17b-16e-instruct' 
+        });
+
+        // Robust JSON Extraction: Cari blok JSON di antara kurung kurawal
+        const jsonMatch = response.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            throw new Error(`AI blabbering: ${response.slice(0, 30)}...`);
+        }
+
+        const cleanJson = jsonMatch[0].trim();
+        const data = JSON.parse(cleanJson);
+
+        // BUFFER PROTECTION: Beri toleransi 30 detik untuk delay proses AI
+        const processingBuffer = 30000; 
+        if (data.success && data.timestamp <= (Date.now() - processingBuffer)) {
+            return { success: false, error: "Waktu sudah lewat boss." };
+        }
+
+        return data;
     } catch (e) {
-        return "Zoe gagal melakukan sinkronisasi saraf internal.";
+        console.error('[Chronos] Parsing Error:', e.message);
+        return { success: false, error: "Gagal membedah waktu." };
     }
 }
 

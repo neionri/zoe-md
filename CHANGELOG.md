@@ -2,6 +2,13 @@
 
 Semua perubahan syaraf dan evolusi sistem Zoe dicatat di sini.
 
+## [2.5.0] - Stage: Neural Awareness 🕰️
+### Added
+- **Neural Reminder System**: Fitur pengingat dengan Natural Language Parsing (NLP).
+- **Chronos-v1 Specialist**: AI Specialist untuk menafsirkan waktu (jam, tanggal, durasi).
+- **Temporal Sync**: Background scheduler yang mengecek pengingat setiap 60 detik.
+- **Persistence**: Database collection `Reminders` untuk ketahanan data saat restart.
+
 ## [2.4.0] - Stage: Deployment Ready 🐳
 ### Added
 - **Dockerization**: `Dockerfile` dan `docker-compose.yml` untuk deployment profesional.

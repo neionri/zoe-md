@@ -14,6 +14,7 @@ import { connectToWhatsApp } from './connection/index.js';
 import * as db from './func/db.js';
 import * as imageHelper from './func/imageHelper.js';
 import { incrementVersion, getVersion } from './func/versionManager.js';
+import { initNeuralScheduler } from './func/scheduler.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -54,8 +55,11 @@ function watchRecursive(dir, callback) {
  * Validasi Syaraf Utama (Variable Check)
  */
 function validateNeuralPulse() {
-    const required = ['GROQ_API_KEY', 'MONGODB_URI', 'OWNER_NUMBER'];
+    const groqKey = process.env.GROQ_API_KEY || process.env.GROQ_API_KEYS;
+    const required = ['MONGODB_URI', 'OWNER_NUMBER'];
     const missing = required.filter(key => !process.env[key]);
+
+    if (!groqKey) missing.push('GROQ_API_KEY');
 
     if (missing.length > 0) {
         console.error(`\x1b[31m[Critical Error]\x1b[0m Syaraf Zoe tidak lengkap. Variabel .env berikut hilang:`);
@@ -104,8 +108,11 @@ async function start() {
 
     // 4. Hubungkan ke WhatsApp Socket
     connectToWhatsApp((sock, m) => handleMessage(sock, m))
-        .then(() => {
+        .then((sock) => {
             console.log('\x1b[35m[Zoe]\x1b[0m Neural connection established.');
+            
+            // 5. Jalankan Penjaga Waktu (Scheduler)
+            initNeuralScheduler(sock);
         })
         .catch(err => console.error('\x1b[31m[Failed]\x1b[0m Initialization error:', err));
 }
