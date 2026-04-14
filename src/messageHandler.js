@@ -195,10 +195,20 @@ async function _executeNeuralLogic(sock, m, batch) {
 
     helper.coolLog('NETWORK', `Processing batch of ${batch.length} synapses from ${remoteJid.split('@')[0]}`);
 
-    const participantJid = helper.getSender(m);
+    const participantJid = helper.getParticipant(m);
     const participantNumber = participantJid.split('@')[0].split(':')[0]; 
     const ownerNumber = (process.env.OWNER_NUMBER || '').replace(/[^\d]/g, '');
-    const isOwner = participantNumber === ownerNumber || participantNumber.endsWith(ownerNumber.slice(-10)) || ownerNumber.endsWith(participantNumber.slice(-10));
+    const ownerLid = helper.jidNormalize(process.env.OWNER_LID);
+
+    // Otentikasi Owner: Berdasarkan nomor HP atau identitas LID
+    const isOwner = participantNumber === ownerNumber || 
+                    participantNumber.endsWith(ownerNumber.slice(-10)) || 
+                    ownerNumber.endsWith(participantNumber.slice(-10)) ||
+                    (ownerLid && participantJid === ownerLid);
+
+    // DEBUG LOG OWNER (Temporary)
+    helper.coolLog('BRAIN', `Owner Check -> Sender: ${participantJid} | ConfigLid: ${ownerLid} | IsOwner: ${isOwner}`);
+
     const isGroup = remoteJid.endsWith('@g.us');
     const isPrivate = !isGroup;
     const pushName = m.messages[0].pushName || 'Seseorang';
@@ -260,6 +270,25 @@ async function _executeNeuralLogic(sock, m, batch) {
                 }
                 return;
             }
+        }
+    }
+
+    // 6.5. SELECTIVE ATTENTION (Group Interaction Filter)
+    // Di Grup, Zoe cuma bales chat AI jika di-reply, di-mention, atau itu adalah command (sudah dihandle di atas).
+    if (isGroup) {
+        const botJid = helper.jidNormalize(sock.user.id);
+        const botLid = sock.user.lid ? helper.jidNormalize(sock.user.lid) : null;
+        const quotedSender = helper.jidNormalize(helper.getQuotedSender(m));
+        const mentions = (m.messages[0].message?.extendedTextMessage?.contextInfo?.mentionedJid || []).map(j => helper.jidNormalize(j));
+        
+        const isBotMentioned = mentions.includes(botJid) || (botLid && mentions.includes(botLid));
+        const isReplyToBot = quotedSender === botJid || (botLid && quotedSender === botLid);
+        const isNamed = combinedText.toLowerCase().includes('zoe');
+
+        // Jika bukan command (sudah lewat pengecekan di atas) dan tidak di-mention/reply/panggilan nama, abaikan.
+        if (!isBotMentioned && !isReplyToBot && !isNamed) {
+            startOfflineTimer();
+            return;
         }
     }
 

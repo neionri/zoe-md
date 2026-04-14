@@ -2,6 +2,15 @@
 
 Semua perubahan syaraf dan evolusi sistem Zoe dicatat di sini.
 
+## [2.5.18] - Stage: Identity Evolution 🎭🧬
+### Added
+- **Neural Selective Attention**: Bot sekarang hanya merespon di grup jika di-reply, di-mention, atau dipanggil namanya. 🛡️🔐
+- **Multi-Identity (LID) Support**: Dukungan penuh untuk identitas WhatsApp Linked Identity (@lid) untuk bot dan owner.
+- **Name Sensing Trigger**: Zoe otomatis bergabung dalam percakapan jika keyword 'zoe' disebutkan. 🗣️👂
+- **Neural Participant Identifier**: Sistem ekstraksi identitas pengirim asli yang akurat dalam lingkungan multi-user.
+### Fixed
+- **JID Normalization Bug**: Perbaikan kritis pada radar identitas yang sebelumnya menyebabkan hilangnya domain grup (@g.us). 🧼✅
+
 ## [2.5.0] - Stage: Neural Awareness 🕰️
 ### Added
 - **Neural Reminder System**: Fitur pengingat dengan Natural Language Parsing (NLP).

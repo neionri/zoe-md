@@ -43,6 +43,16 @@ export function getMessageContent(m) {
 }
 
 /**
+ * Ekstraktor Pengirim Pesan Quoted
+ * Mengambil JID dari orang yang pesannya dibalas.
+ */
+export function getQuotedSender(m) {
+    return m.messages[0].message?.extendedTextMessage?.contextInfo?.participant || 
+           m.messages[0].message?.extendedTextMessage?.contextInfo?.remoteJid || 
+           null;
+}
+
+/**
  * Ekstraktor Teks Quoted (Reply)
  * Mengambil teks dari pesan yang dibalas (replied message).
  * 
@@ -50,7 +60,8 @@ export function getMessageContent(m) {
  * @returns {string|null} Teks pesan quoted atau null jika tidak ada.
  */
 export function getQuotedText(m) {
-    const quotedMessage = m.messages[0].message?.extendedTextMessage?.contextInfo?.quotedMessage;
+    const contextInfo = m.messages[0].message?.extendedTextMessage?.contextInfo;
+    const quotedMessage = contextInfo?.quotedMessage;
     if (!quotedMessage) return null;
 
     return quotedMessage.conversation || 
@@ -60,11 +71,32 @@ export function getQuotedText(m) {
 }
 
 /**
- * Ekstraktor Pengirim
- * Mengambil ID JID pengirim pesan.
+ * Normalisasi JID
+ * Menghapus suffix perangkat (misal :1) tapi menjaga domain (@g.us atau @s.whatsapp.net).
+ */
+export function jidNormalize(jid) {
+    if (!jid || typeof jid !== 'string') return jid;
+    const [user, domain] = jid.split('@');
+    if (!domain) return jid;
+    const cleanUser = user.split(':')[0];
+    return `${cleanUser}@${domain}`;
+}
+
+/**
+ * Ekstraktor Pengirim (Chat ID)
+ * Mengambil ID JID tujuan (Grup atau Private Chat).
  */
 export function getSender(m) {
-    return m.messages[0].key.remoteJid;
+    return jidNormalize(m.messages[0].key.remoteJid);
+}
+
+/**
+ * Ekstraktor Partisipan (Original Sender)
+ * Mengambil ID JID orang yang mengirim pesan (Real Person).
+ */
+export function getParticipant(m) {
+    const key = m.messages[0].key;
+    return jidNormalize(key.participant || key.remoteJid);
 }
 
 /**
