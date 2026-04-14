@@ -89,8 +89,8 @@ Zoe memerlukan otak dari Groq Cloud. Boss bisa ambil kuncinya di sini:
 
 ### 3. Kloning & Instalasi Library
 ```bash
-git clone [URL_REPO_BOSS]
-cd wa
+git clone https://github.com/neionri/zoe-md.git
+cd zoe-md
 npm install
 ```
 
@@ -178,9 +178,9 @@ Pastikan file `.env` Anda terisi dengan benar:
 - **Usage**: `.s` (Balas ke gambar/video)
 - **Result**: Stiker statis atau bergerak (GIF/Video).
 
-### 🛡️ Security Audit
-- **Usage**: `.audit [email]`
-- **Function**: Mencari kebocoran data pribadi di database breach global.
+### 🕵️ Neural Logic Audit
+- **Usage**: `.audit [teks]` (atau reply pesan orang lain)
+- **Function**: Membedah teks menggunakan spesialis **Orpheus-v1** untuk mencari kesalahan logika (*Logical Fallacies*) dan membantainya dengan gaya sarkas Zoe.
 
 ---
 
