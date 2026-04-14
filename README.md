@@ -10,6 +10,11 @@
 **High-Density Operative AI for WhatsApp**
 *Autonomous, Sarcastic, and Architecturally Superior.*
 
+> [!WARNING]
+> **DISCLAIMER & RISK OF BAN**: Zoe dibangun menggunakan API WhatsApp tidak resmi (**Baileys**). Penggunaan bot ini memiliki risiko pemblokiran akun oleh pihak WhatsApp. Pengembang tidak bertanggung jawab atas segala bentuk kerugian, kehilangan data, atau sanksi akun yang diakibatkan oleh penggunaan software ini.
+> 
+> **Penting**: Disarankan **TIDAK** menggunakan nomor WhatsApp pribadi utama Anda. Gunakanlah nomor cadangan untuk menghindari risiko kehilangan kontak penting. **Resiko ditanggung sendiri.**
+
 ---
 
 ## 📖 Neural Navigation (Table of Contents)
@@ -74,6 +79,9 @@ Ikuti langkah-langkah berikut untuk menghidupkan raga digital Zoe di server Anda
 - **FFmpeg**: Wajib terinstall dan masuk ke System PATH (Untuk pemrosesan audio/video).
 - **Python 3.10+**: Diperlukan oleh engine `yt-dlp`.
 - **Database**: MongoDB (Bisa gunakan MongoDB Atlas atau Local).
+
+> [!CAUTION]
+> Fitur **Universal Downloader (.dl)** TIDAK AKAN BERJALAN jika FFmpeg dan Python tidak terdeteksi di System PATH Anda. Pastikan keduanya sudah siap sebelum menyalakan Zoe.
 
 ### 2. Pengambilan API Key
 Zoe memerlukan otak dari Groq Cloud. Boss bisa ambil kuncinya di sini:
@@ -153,6 +161,9 @@ Pastikan file `.env` Anda terisi dengan benar:
 | `MONGODB_URI` | Koneksi database untuk ingatan permanen. |
 | `OWNER_NUMBER` | Nomor WhatsApp master Anda (Tanpa simbol). |
 | `PAIRING_NUMBER` | Nomor yang akan digunakan Zoe untuk login pertama kali. |
+
+> [!NOTE]
+> **Groq Rate Limits**: Jika Anda menggunakan akun Groq gratis, harap perhatikan batas panggilan API (RPM/TPM). Jika Anda melakukan spam percakapan terlalu cepat, Zoe mungkin akan mengalami error *Rate Limit* (429).
 
 ---
 
