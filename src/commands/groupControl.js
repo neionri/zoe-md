@@ -9,6 +9,7 @@ import * as db from '../func/db.js';
 
 export const name = 'bcmd';
 export const aliases = ['ubcmd', 'listbcmd'];
+export const hiddenAliases = ['ban', 'unban', 'unbcmd', 'listban'];
 export const description = 'Neural Command Moderation (Admin Only).';
 export const category = 'Group Control';
 
@@ -46,8 +47,8 @@ export default async function run(sock, m, { command, args, helper, isOwner, isG
 
     // --- LOGIC BRANCHING BERDASARKAN COMMAND ---
 
-    // 2. BAN COMMAND (.bcmd)
-    if (command === 'bcmd') {
+    // 2. BAN COMMAND (.bcmd, .ban)
+    if (['bcmd', 'ban'].includes(command)) {
         const cmdToBan = args[0]?.toLowerCase()?.trim()?.replace(/^\./, '');
         if (!cmdToBan) {
             await sock.sendMessage(remoteJid, { text: `Tentukan perintahnya boss. Contoh: .bcmd sticker` });
@@ -67,8 +68,8 @@ export default async function run(sock, m, { command, args, helper, isOwner, isG
         return await sock.sendMessage(remoteJid, { text: `✅ *Neural Lockdown*: Perintah .${cmdToBan} resmi dilarang di ${scope}. Otoritas: ${authName}.` });
     }
 
-    // 3. UNBAN COMMAND (.ubcmd)
-    if (command === 'ubcmd') {
+    // 3. UNBAN COMMAND (.ubcmd, .unban, .unbcmd)
+    if (['ubcmd', 'unban', 'unbcmd'].includes(command)) {
         const cmdToUnban = args[0]?.toLowerCase()?.trim()?.replace(/^\./, '');
         if (!cmdToUnban) {
             await sock.sendMessage(remoteJid, { text: `Mana perintah yang mau dibebasin? Contoh: .ubcmd sticker` });
@@ -88,8 +89,8 @@ export default async function run(sock, m, { command, args, helper, isOwner, isG
         return await sock.sendMessage(remoteJid, { text: `🔓 *Lockdown Lifted*: Sip, perintah .${cmdToUnban} dibuka lagi untuk ${scope}.` });
     }
 
-    // 4. LIST BANNED COMMANDS (.listbcmd)
-    if (command === 'listbcmd') {
+    // 4. LIST BANNED COMMANDS (.listbcmd, .listban)
+    if (['listbcmd', 'listban'].includes(command)) {
         const scopeTitle = isGroup ? "Grup Ini" : "Seluruh Matrix (GLOBAL)";
         const emptyMsg = isGroup ? "Grup ini masih \"suci\", nggak ada perintah yang dilarang lokal." : "Belum ada perintah yang dilarang secara internasional (Global).";
 

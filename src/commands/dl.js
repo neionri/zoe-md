@@ -1,7 +1,8 @@
 // Neural Downloader dependency will be loaded dynamically to avoid caching issues
 
 export const name = 'dl';
-export const aliases = ['download', 'ytdl', 'igdl', 'ttdl'];
+export const aliases = ['ytdl', 'igdl', 'ttdl'];
+export const hiddenAliases = ['download'];
 export const description = 'Universal Neural Media Downloader';
 export const category = 'Neural Specialist';
 

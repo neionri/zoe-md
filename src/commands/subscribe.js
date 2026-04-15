@@ -5,7 +5,8 @@
  */
 
 export const name = 'langganan';
-export const aliases = ['premium', 'vip', 'beli', 'buy', 'payment'];
+export const aliases = [];
+export const hiddenAliases = ['premium', 'vip', 'beli', 'buy', 'payment'];
 export const description = 'Neural Kasta Upgrade Information.';
 export const category = 'Utility';
 

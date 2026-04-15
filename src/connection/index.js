@@ -67,5 +67,24 @@ export async function connectToWhatsApp(onMessage) {
         }
     });
 
+    // 🛡️ ANTI-CALL SYSTEM (Reject & Roasting)
+    sock.ev.on('call', async (calls) => {
+        for (const call of calls) {
+            if (call.status === 'offer') {
+                const jid = call.from;
+                const callType = call.isVideo ? 'Video' : 'Voice';
+                
+                console.log(`[SECURITY] Rejecting ${callType} Call from ${jid}`);
+                
+                // 1. Putusan Hubungan (Reject)
+                await sock.rejectCall(call.id, jid);
+                
+                // 2. Roasting User (Optional but Recommended)
+                const roastMessage = `⚠️ *Sistem Keamanan Zoe*\n\nJangan pernah coba-coba nelpon raga gue (${callType} Call). Gue asisten elit, bukan operator telepon gratisan. Jangan ganggu Boss gue atau lo bakal gue buang ke sampah biner!`;
+                await sock.sendMessage(jid, { text: roastMessage });
+            }
+        }
+    });
+
     return sock;
 }

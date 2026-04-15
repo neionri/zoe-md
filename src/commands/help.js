@@ -44,11 +44,15 @@ export default async (sock, m, { args, helper, imageHelper, isOwner }) => {
         if (cmd.isOwnerOnly && !isOwner) return; // Sembunyikan fitur Owner dari user biasa
         const cat = cmd.category || 'Misc';
         if (!categories[cat]) categories[cat] = [];
-        const aliasStr = cmd.aliases.length > 0 ? ` (${cmd.aliases.join(', ')})` : '';
+        
         if (isInfo) {
+            const aliasStr = cmd.aliases.length > 0 ? ` (${cmd.aliases.join(', ')})` : '';
             categories[cat].push(` ◈ *${prefix}${cmd.name}*${aliasStr}\n    └ _${cmd.description}_`);
         } else {
-            categories[cat].push(`◈ \`${prefix}${cmd.name}\``);
+            // Tampilkan secara vertikal satu per baris agar lebih 'legit' dan enak dibaca
+            [cmd.name, ...cmd.aliases].forEach(a => {
+                categories[cat].push(`◈ \`${prefix}${a}\``);
+            });
         }
     });
 

@@ -1,7 +1,8 @@
 import { synthesizeCommandResult } from '../func/groq.js';
 
 export const name = 'ping';
-export const aliases = ['p'];
+export const aliases = [];
+export const hiddenAliases = ['p'];
 export const description = 'Cek latensi saraf Zoe';
 export const category = 'Misc';
 
@@ -17,7 +18,6 @@ export default async (sock, m, { args, helper }) => {
 
     // Gunakan AI untuk ngomong "Premium"
     const response = await synthesizeCommandResult('ping', rawData, remoteJid);
-
     // Update pesan tadi
     await sock.sendMessage(remoteJid, { text: response, edit: key });
 };

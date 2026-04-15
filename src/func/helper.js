@@ -147,3 +147,20 @@ export function coolLog(type, message) {
     
     console.log(`${grey}[${time}]${reset} ${color}[${type}]${reset} ${message}`);
 }
+
+/**
+ * findParticipant (Deep-Scan Meta)
+ * Mencari partisipan dalam metadata grup dengan dukungan JID dan LID.
+ * 
+ * @param {Object} meta - Metadata grup dari sock.groupMetadata.
+ * @param {string} targetJID - JID target yang dicari (JID atau LID).
+ * @returns {Object|null} Objek partisipan atau null.
+ */
+export function findParticipant(meta, targetJID) {
+    if (!meta?.participants || !targetJID) return null;
+    const jid = jidNormalize(targetJID);
+    return meta.participants.find(p => 
+        jidNormalize(p.id) === jid || 
+        (p.lid && jidNormalize(p.lid) === jid)
+    );
+}

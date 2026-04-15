@@ -9,8 +9,10 @@ import * as memory from '../func/memory.js';
 
 export const name = 'addprem';
 export const aliases = ['addvip', 'delkasta', 'addprime'];
+export const hiddenAliases = ['prem', 'vip', 'hapuskasta'];
 export const description = 'Neural Tiering Control (Boss Only).';
 export const category = 'Owner';
+export const isOwnerOnly = true;
 
 export default async function run(sock, m, { command, args, helper, groq, isOwner }) {
     // 1. Otoritas Mutlak
@@ -43,8 +45,8 @@ export default async function run(sock, m, { command, args, helper, groq, isOwne
 
     // --- LOGIC BRANCHING ---
 
-    // 3. ADD PREMIUM (.addprem)
-    if (command === 'addprem') {
+    // 3. ADD PREMIUM (.addprem, .prem)
+    if (['addprem', 'prem'].includes(command)) {
         const days = parseInt(args[args.length - 1]) || 30;
         const expiredDate = new Date();
         expiredDate.setDate(expiredDate.getDate() + days);
@@ -61,8 +63,8 @@ export default async function run(sock, m, { command, args, helper, groq, isOwne
         });
     }
 
-    // 4. ADD VIP (.addvip)
-    if (command === 'addvip') {
+    // 4. ADD VIP (.addvip, .vip)
+    if (['addvip', 'vip'].includes(command)) {
         const prevTier = (await memory.getUserConfig(target)).tier;
         await memory.updateUserConfig(target, { 
             tier: 'vip', 
@@ -76,8 +78,8 @@ export default async function run(sock, m, { command, args, helper, groq, isOwne
         });
     }
 
-    // 5. DELETE KASTA (.delkasta)
-    if (command === 'delkasta') {
+    // 5. DELETE KASTA (.delkasta, .hapuskasta)
+    if (['delkasta', 'hapuskasta'].includes(command)) {
         await memory.updateUserConfig(target, { 
             tier: 'free', 
             premiumUntil: null 

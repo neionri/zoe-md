@@ -18,6 +18,7 @@ export async function loadCommands() {
                     name: commandModule.name,
                     description: commandModule.description || 'No description',
                     aliases: commandModule.aliases || [],
+                    hiddenAliases: commandModule.hiddenAliases || [],
                     category: commandModule.category || 'Misc',
                     isOwnerOnly: commandModule.isOwnerOnly || false
                 };
@@ -26,6 +27,9 @@ export async function loadCommands() {
                 commands.set(commandModule.name, { ...cmdData, run: commandModule.default });
                 if (commandModule.aliases) {
                     commandModule.aliases.forEach(alias => commands.set(alias, { ...cmdData, run: commandModule.default }));
+                }
+                if (commandModule.hiddenAliases) {
+                    commandModule.hiddenAliases.forEach(alias => commands.set(alias, { ...cmdData, run: commandModule.default }));
                 }
             }
         } catch (error) {

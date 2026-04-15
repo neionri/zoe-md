@@ -54,6 +54,13 @@ const ApiState = mongoose.model('ApiState', ApiStateSchema);
 const ZoeGallery = mongoose.model('ZoeGallery', ZoeGallerySchema);
 const Reminder = mongoose.model('Reminder', ReminderSchema);
 
+const ChannelAliasSchema = new mongoose.Schema({
+    alias: { type: String, required: true, unique: true, lowercase: true },
+    jid: { type: String, required: true },
+    addedAt: { type: Date, default: Date.now }
+});
+const ChannelAlias = mongoose.model('ChannelAlias', ChannelAliasSchema);
+
 // Command Execution Log Schema
 const CommandLogSchema = new mongoose.Schema({
     command:   { type: String, required: true },
@@ -177,4 +184,29 @@ export async function getCommandStats() {
         CommandLog.find().sort({ createdAt: -1 }).limit(50).lean()
     ]);
     return { success, failed, recent };
+}
+
+/**
+ * CHANNEL ALIAS HELPERS (Mongoose)
+ */
+export async function saveChannelAlias(alias, jid) {
+    return await ChannelAlias.findOneAndUpdate(
+        { alias: alias.toLowerCase() },
+        { $set: { jid } },
+        { upsert: true, returnDocument: 'after' }
+    );
+}
+
+export async function getChannelAlias(alias) {
+    const doc = await ChannelAlias.findOne({ alias: alias.toLowerCase() });
+    return doc ? doc.jid : null;
+}
+
+export async function deleteChannelAlias(alias) {
+    const doc = await ChannelAlias.findOneAndDelete({ alias: alias.toLowerCase() });
+    return doc !== null; // return true if deleted
+}
+
+export async function getAllChannelAliases() {
+    return await ChannelAlias.find().sort({ alias: 1 });
 }

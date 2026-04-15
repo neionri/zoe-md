@@ -1,0 +1,78 @@
+# Laporan Intelijen: Bedah Syaraf Grup Baileys 🛰️👥⚙️
+
+Daftar perintah tingkat rendah (low-level functions) yang tersedia pada objek `sock` untuk mengendalikan grup WhatsApp melalui Zoe.
+
+## 1. Intelijen & Informasi Grup
+
+### `sock.groupMetadata(jid)`
+> Menarik seluruh data grup (Admin, Deskripsi, Nama, Member).
+- **Format**: `const meta = await sock.groupMetadata("12345@g.us")`
+- **Output**: Objek berisi `id`, `subject`, `participants`, dll.
+
+### `sock.groupFetchAllParticipating()`
+> Menarik daftar seluruh grup yang diikuti bot.
+- **Format**: `const groups = await sock.groupFetchAllParticipating()`
+
+---
+
+## 2. Kendali Member (Participants Management)
+
+Fungsi utama: `sock.groupParticipantsUpdate(jid, [participants], action)`
+
+| Action | Kegunaan | Contoh Penggunaan |
+| :--- | :--- | :--- |
+| **'add'** | Menambahkan member baru | `await sock.groupParticipantsUpdate(jid, ["628xxx@s.whatsapp.net"], 'add')` |
+| **'remove'** | Menendang (Kick) member | `await sock.groupParticipantsUpdate(jid, ["628xxx@s.whatsapp.net"], 'remove')` |
+| **'promote'** | Menjadikan Admin | `await sock.groupParticipantsUpdate(jid, ["628xxx@s.whatsapp.net"], 'promote')` |
+| **'demote'** | Mencopot jabatan Admin | `await sock.groupParticipantsUpdate(jid, ["628xxx@s.whatsapp.net"], 'demote')` |
+
+---
+
+## 3. Pengaturan Inti (Group Settings)
+
+### `sock.groupUpdateSubject(jid, newSubject)`
+> Mengganti nama grup.
+- **Contoh**: `await sock.groupUpdateSubject(jid, "Markas Neural Zoe V3")`
+
+### `sock.groupUpdateDescription(jid, description)`
+> Mengganti deskripsi grup.
+- **Contoh**: `await sock.groupUpdateDescription(jid, "Grup yang dikontrol oleh AI.")`
+
+### `sock.groupSettingUpdate(jid, setting)`
+> Mengunci atau membuka gerbang grup.
+- **'announcement'**: Hanya admin yang bisa chat (Tutup Grup).
+- **'not_announcement'**: Semua orang bisa chat (Buka Grup).
+- **'locked'**: Hanya admin yang bisa edit info grup.
+- **'unlocked'**: Semua orang bisa edit info grup.
+- **Contoh**: `await sock.groupSettingUpdate(jid, 'announcement')`
+
+---
+
+## 4. Undangan & Tautan (Invite Link)
+
+### `sock.groupInviteCode(jid)`
+> Mendapatkan kode undangan grup (Link).
+- **Contoh**: `const code = await sock.groupInviteCode(jid)`
+
+### `sock.groupRevokeInviteCode(jid)`
+> Mereset link grup (menghapus yang lama).
+- **Contoh**: `await sock.groupRevokeInviteCode(jid)`
+
+### `sock.groupAcceptInvite(code)`
+> Bot masuk ke grup lewat link.
+- **Contoh**: `await sock.groupAcceptInvite("abcd12345")`
+
+---
+
+## 5. Exit Gerbang
+
+### `sock.groupLeave(jid)`
+> Menyuruh Zoe keluar dari grup dengan hormat.
+- **Contoh**: `await sock.groupLeave(jid)`
+
+---
+
+> [!TIP]
+> **Cara Tes Menggunakan Override (`>`)**:
+> Coba ketik: `> await sock.groupMetadata(m.chat)` 
+> Zoe bakal langsung nampilin data mentah grup tempat Boss berada sekarang.

@@ -10,7 +10,8 @@ import * as groq from '../func/groq.js';
  */
 
 export const name = 'remindme';
-export const aliases = ['remind', 'ingetin'];
+export const aliases = [];
+export const hiddenAliases = ['remind', 'ingetin'];
 export const description = 'Menyetel pengingat neural (Mendukung bahasa natural).';
 export const category = 'Neural Logic';
 

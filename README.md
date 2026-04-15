@@ -10,10 +10,25 @@
 **High-Density Operative AI for WhatsApp**
 *Autonomous, Sarcastic, and Architecturally Superior.*
 
-> [!WARNING]
-> **DISCLAIMER & RISK OF BAN**: Zoe dibangun menggunakan API WhatsApp tidak resmi (**Baileys**). Penggunaan bot ini memiliki risiko pemblokiran akun oleh pihak WhatsApp. Pengembang tidak bertanggung jawab atas segala bentuk kerugian, kehilangan data, atau sanksi akun yang diakibatkan oleh penggunaan software ini.
-> 
-> **Penting**: Disarankan **TIDAK** menggunakan nomor WhatsApp pribadi utama Anda. Gunakanlah nomor cadangan untuk menghindari risiko kehilangan kontak penting. **Resiko ditanggung sendiri.**
+> [!CAUTION]
+> ### 🛡️ LEGAL DISCLAIMER & NEURAL SAFETY PROTOCOL
+>
+> **1. STATUS PROYEK (NON-OFFICIAL)**
+> Zoe dibangun di atas library **Baileys**, yang merupakan implementasi tidak resmi (*unofficial*) dari protokol WhatsApp. Proyek ini **TIDAK** terafiliasi, didukung, atau disetujui oleh WhatsApp Inc., Meta Platforms Inc., atau entitas terkait lainnya. Penggunaan software ini merupakan pelanggaran terhadap *Terms of Service* (ToS) resmi WhatsApp.
+>
+> **2. RISIKO PEMBLOKIRAN (ACCOUNT INTEGRITY)**
+> WhatsApp secara aktif memantau dan memblokir akun yang terdeteksi melakukan otomasi atau menggunakan klien tidak resmi. Penggunaan Zoe memiliki risiko **PEMBLOKIRAN PERMANEN** pada nomor telepon Anda. Pengembang tidak menjamin keamanan akun Anda dan tidak dapat membantu memulihkan akun yang terblokir.
+>
+> **3. TANGGUNG JAWAB PENGGUNA (NON-LIABILITY)**
+> Seluruh aktivitas yang dilakukan melalui raga digital Zoe (termasuk namun tidak terbatas pada: pengumpulan data, pengunduhan media, manajemen grup, dan obrolan AI) adalah **TANGGUNG JAWAB MUTLAK PENGGUNA**. Penulis kode/pengembang dibebaskan dari segala tuntutan hukum, kerugian material, kehilangan data, atau sanksi pidana/perdata yang mungkin timbul akibat penyalahgunaan software ini.
+>
+> **4. KEAMANAN DATA SENSITIF**
+> Software ini menghasilkan file sesi (`auth_info/`) dan cookies (`cookies.txt`) yang berisi identitas digital Anda. Kebocoran file-file tersebut dapat mengakibatkan **pembajakan akun** oleh pihak ketiga. Anda bertanggung jawab penuh untuk mengamankan kredensial tersebut. Jangan pernah membagikan folder `auth_info` atau file `.env` kepada siapapun.
+>
+> **5. TUJUAN EDUKASI & RISET**
+> Proyek ini dipublikasikan murni untuk tujuan **Pendidikan, Riset, dan Pembelajaran** mengenai arsitektur sistem asisten AI dan integrasi API. Sangat disarankan untuk **TIDAK** menggunakan nomor WhatsApp utama Anda. Gunakanlah nomor cadangan (*second account*).
+>
+> **DENGAN MENGGUNAKAN SOFTWARE INI, ANDA DIANGGAP TELAH MEMBACA, MEMAHAMI, DAN MENYETUJUI SELURUH RISIKO DI ATAS TANPA PENGECUALIAN.**
 
 ---
 
@@ -44,25 +59,27 @@ Zoe didesain dengan filosofi **Centralized Neural Dispatcher**. Berbeda dengan b
 ## 📂 Neural Structure (Folder Mapping)
 
 ```text
-c:\wa
+z:\wa
 ├── src/
+│   ├── index.js            # Entry Point (Hot-Reload & Heartbeat System)
+│   ├── messageHandler.js   # Neural Dispatcher (Priority & Scoping Aware)
 │   ├── commands/           # Kumpulan modul perintah bot (Hot-Reloadable)
-│   │   ├── dl.js           # Universal Media Downloader
-│   │   ├── audit.js        # Security Breach Scanner
-│   │   ├── sticker.js      # Media to Sticker Converter (Tiered)
-│   │   ├── subscribe.js    # Manual Payment & Pricing
-│   │   ├── userStatus.js   # Neural Identity Card (.me)
-│   │   └── userControl.js  # Owner Admin Console
-│   ├── func/               # Engine & Logika Pendukung (Syaraf Pusat)
-│   │   ├── bouncer.js      # Keamanan, Ban, & Spam Moderation
-│   │   ├── downloader.js   # Integration Engine (Tiered Limits)
-│   │   ├── memory.js       # Hierarchical Memory Management
-│   │   ├── groq.js         # AI Synthesis & Vision logic
-│   │   ├── db.js           # MongoDB Core Connection
-│   │   └── priorityQueue.js # Global Priority Path (v3.2.x)
-│   └── messageHandler.js   # Dispatcher Utama (Priority Aware)
-├── scratch/                # Temporary Storage (Donlot & Voice cache)
-├── .env                    # Secrets & Config
+│   │   ├── index.js        # Neural Command Loader (Hidden Alias Aware)
+│   │   ├── help.js         # Interactive Neural Menu (Vertical/Filtered)
+│   │   └── [23+ Modul]     # (dl, ghostControl, intelControl, etc.)
+│   ├── connection/         # WhatsApp Socket Engine
+│   │   └── index.js        # Auth, Connection Protocol, & Anti-Call Defense
+│   ├── dashboard/          # Neural Web UI Interface
+│   │   └── public/         # Matrix Dashboard Frontend (HTML/CSS/JS)
+│   └── func/               # Syaraf Pusat (Logic & Engine Pendukung)
+│       ├── bouncer.js      # Keamanan, Ban, & Spam Moderation
+│       ├── groq.js         # AI Synthesis Engine (Otak Pusat)
+│       ├── dashboardServer.js # Neural Web Dashboard Backend
+│       └── [8+ Syaraf]     # (helper, database, scheduler, etc.)
+├── scratch/                # Temporary Storage (Download & Voice cache)
+├── zoe/                    # Neural Portrait Gallery (HD Portrait Assets)
+├── auth_info/              # E2EE Identity (Folder Kunci/Auth - Private)
+├── .env                    # Secrets & Konfigurasi Syaraf
 └── README.md               # Neural Manual (Lo lagi baca ini)
 ```
 
@@ -100,12 +117,22 @@ npm install
 ```
 
 ### 4. Konfigurasi Sistem (.env)
-Buat file bernama `.env` di direktori utama dan isi dengan data berikut:
+Buat file bernama `.env` di direktori utama dan isi dengan struktur berikut:
 ```env
-GROQ_API_KEYS=gsk_key1, gsk_key2  # Multi-key rotation
-MONGODB_URI=mongodb://...         # Link koneksi MongoDB Anda
-OWNER_LID=1400xxx                 # Identitas Master
-OWNER_NAME=BossName               # Nama Master
+# Otak AI (Neural Brain Key)
+GROQ_API_KEYS=gsk_3h7x1...
+PREFIX=.
+
+# Database (Zoe Cloud Brain)
+MONGODB_URI=mongodb://...
+
+# Identitas Mutlak Master (Owner)
+OWNER_NUMBER=628560xxxxxxx
+OWNER_LID=1400xxxxxxx
+OWNER_NAME=BossName
+
+# Identitas Visual Bot
+BOT_NAME=Zoe Core
 ```
 
 ### 5. Menghidupkan Zoe
@@ -163,37 +190,27 @@ Didesain untuk ketahanan operasional:
 
 ## ⚙️ Configuration & Environment
 
-Pastikan file `.env` Anda terisi dengan benar:
+Pastikan file `.env` Anda terisi dengan benar untuk menjamin stabilitas syaraf Zoe:
 
 | Key | Description |
 |---|---|
-| `GROQ_API_KEY` | Kunci akses ke otak AI Zoe (Groq Cloud). |
-| `MONGODB_URI` | Koneksi database untuk ingatan permanen. |
-| `OWNER_NUMBER` | Nomor WhatsApp master Anda (Tanpa simbol). |
-| `PAIRING_NUMBER` | Nomor yang akan digunakan Zoe untuk login pertama kali. |
+| `GROQ_API_KEYS` | Daftar kunci akses (Multi-key) ke otak AI Zoe. Pisahkan dengan koma untuk rotasi otomatis. |
+| `PREFIX` | Simbol pemicu perintah (Default: `.`). |
+| `MONGODB_URI` | Koneksi database MongoDB untuk ingatan permanen dan konfigurasi grup. |
+| `OWNER_NUMBER` | Nomor WhatsApp master Anda (Format: 62xx, tanpa simbol +). |
+| `OWNER_LID` | Identitas unik WhatsApp (LID) milik Master untuk validasi otoritas mutlak. |
+| `OWNER_NAME` | Nama Master yang akan digunakan Zoe dalam percakapan. |
+| `BOT_NAME` | Identitas publik raga digital Zoe. |
+| `PORT` | Jalur akses untuk Neural Dashboard (Default: 3000). |
+| `DASHBOARD_PIN` | Kode keamanan akses untuk memantau log via Web Dashboard. |
 
 > [!NOTE]
 > **Groq Rate Limits**: Jika Anda menggunakan akun Groq gratis, harap perhatikan batas panggilan API (RPM/TPM). Jika Anda melakukan spam percakapan terlalu cepat, Zoe mungkin akan mengalami error *Rate Limit* (429).
 
 ---
 
-## 🛰️ Operational Commands
-
-### 💳 Tiering & Identity
-- **`.me`**: Menampilkan kasta, limit, dan statistik harian.
-- **`.langganan`**: Menampilkan harga evolusi kasta & kontak Owner.
-- **`.addprem / .addvip`**: (Owner Only) Mengatur jenjang kasta user.
-
-### 📥 Media Download
-- **Usage**: `.dl [URL]`
-- **Targets**: YouTube, TikTok, Instagram (Reels & Feed).
-- **Options**: Video (High Res), Audio (.mp3), atau Dokumen (Raw file).
-
-### 🕵️ Neural Logic Audit
-- **Usage**: `.audit [teks]` (atau reply pesan orang lain)
-- **Function**: Membedah teks menggunakan spesialis **Orpheus-v1** untuk mencari kesalahan logika (*Logical Fallacies*) dan membantainya dengan gaya sarkas Zoe.
-
 ---
+
 
 ## 📸 Visual Identity (PAP Engine)
 
@@ -214,6 +231,12 @@ Zoe memiliki fitur interaktif di mana dia bisa mengirimkan foto dirinya sendiri 
 
 ## 🛡️ Galactic Etiquette
 Zoe adalah AI yang memiliki "Harga Diri". Jika Anda memperlakukannya seperti mesin murahan (spamming), sistem **Bouncer** akan secara otomatis memutus akses Anda. Gunakan dengan bijak, Bos!
+
+## 🔗 Connect with Matrix
+Jalin koneksi sinaptik lebih dalam atau diskusi fitur melalui portal resmi kami:
+
+- **WhatsApp Channel**: [Zoe Neural Channel](https://whatsapp.com/channel/0029Vb7lDZ08vd1G2s5hpx2Y) 📢
+- **WhatsApp Group**: [Matrix Community](https://chat.whatsapp.com/IN0U7UycFtLJpisYRxKUZ4?mode=gi_t) 👥
 
 ---
 *Developed with High-Density Logic for Neionri.* 🫡🦾⚡

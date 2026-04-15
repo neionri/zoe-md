@@ -10,7 +10,8 @@ import { getVersion } from '../func/versionManager.js';
 import fs from 'fs';
 
 export const name = 'core';
-export const aliases = ['status', 'brain', 'neural', 'saraf'];
+export const aliases = [];
+export const hiddenAliases = ['status', 'brain', 'neural', 'saraf'];
 export const description = 'Monitor kesehatan jaringan saraf dan performa API Zoe.';
 export const category = 'Neural Specialist';
 export const isOwnerOnly = false;

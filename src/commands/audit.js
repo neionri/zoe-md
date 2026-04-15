@@ -7,7 +7,8 @@
  */
 
 export const name = 'audit';
-export const aliases = ['logic', 'deconstruct', 'bedah'];
+export const aliases = [];
+export const hiddenAliases = ['logic', 'deconstruct', 'bedah'];
 export const description = 'Membedah argumen teks untuk mencari kesalahan logika (Specialist Orpheus).';
 export const category = 'Neural Specialist';
 

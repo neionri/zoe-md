@@ -8,7 +8,8 @@ import WebP from 'node-webpmux';
 const execPromise = promisify(exec);
 
 export const name = 'sticker';
-export const aliases = ['s', 'stiker'];
+export const aliases = [];
+export const hiddenAliases = ['s', 'stiker'];
 export const description = 'Pure FFmpeg Neural Sticker Engine';
 export const category = 'Neural Specialist';
 

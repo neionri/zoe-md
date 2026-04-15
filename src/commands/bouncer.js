@@ -9,7 +9,8 @@
 export const name = 'bouncer';
 export const description = 'Mengelola fitur Satpam AI (Shadow Bouncer)';
 export const category = 'Admin';
-export const aliases = ['satpam', 'guard'];
+export const aliases = [];
+export const hiddenAliases = ['satpam', 'guard'];
 export const isOwnerOnly = false;
 
 export default async function run(sock, m, { args, helper, memory, groq, isOwner, isGroup }) {

@@ -2,13 +2,25 @@
 
 Semua perubahan syaraf dan evolusi sistem Zoe dicatat di sini.
 
-## [2.9.15] - Stage: Neural Intake Stability & AI Persona Mastery 📽️🎭🛡️
+## [3.0.21] - Tahap: Penguasaan Antarmuka Global & Pertahanan Neural 🛰️🧤🕵️‍♂️
 ### Added
-- **Neural Authority Persona**: AI-Dynamic responses for Owner commands (`.addprem`, `.addvip`, `.delkasta`), eliminating all hardcoded sarcasm strings.
-- **Bot-Check Resilience**: Integrated `cookies.txt` support and optimized browser headers for YouTube/Instagram extraction.
+- **Sistem Hidden Aliases**: Implementasi sistem "Kasta Alias" di `index.js` (Loader). Memisahkan *Sub-Fitur* (Terlihat) dari *Sinonim/Shortcut* (Tersembunyi) untuk estetika menu tingkat tinggi.
+- **Rekayasa Ulang UI Neural**: Re-desain menu `.help` / `.menu` menjadi format vertikal yang ramah perangkat seluler dengan pengelompokan sub-perintah otomatis.
+- **Ghost Protocol**: Modul baru `ghostControl.js` untuk manajemen kutipan palsu (Fake Quote) dan manipulasi teks obrolan.
+- **Radar Intel Neural**: Fitur `.cekperangkat` untuk deteksi perangkat aktif target menggunakan protokol USync Baileys.
+- **Pertahanan Neural (Anti-Call)**: Sistem penolakan panggilan otomatis terintegrasi di `connection/index.js` dengan balasan sarkas bertenaga AI.
 ### Optimized
-- **Downloader Stability (v2.9)**: Removal of `externalAdReply` UI to guarantee 100% message delivery and zero-latency menu response.
-- **Engine Streamlining**: Simplified internal metadata logic to focus on title extraction and core technical reliability.
+- **Reklasifikasi Hirarki**: Memindahkan otoritas mobilitas (`join` & `leave`) dari kategori Group Control ke kategori **OWNER** demi sinkronisasi kasta.
+- **Penguatan Privasi**: Implementasi global `isOwnerOnly` pada seluruh modul sensitif untuk menjamin menu Owner tetap ghaib bagi user publik.
+- **Sterilisasi Menu**: Audit total terhadap 25+ modul perintah untuk menghilangkan redundansi alias (Kebijakan Zero Redundancy).
+
+## [2.9.15] - Tahap: Stabilitas Intake Neural & Penguasaan Persona AI 📽️🎭🛡️
+### Added
+- **Persona Otoritas Neural**: Respon dinamis AI untuk perintah Owner (`.addprem`, `.addvip`, `.delkasta`), menghapus semua string sarkasme yang bersifat hardcoded.
+- **Ketahanan Bot-Check**: Integrasi dukungan `cookies.txt` dan optimasi header browser untuk ekstraksi YouTube/Instagram.
+### Optimized
+- **Stabilitas Downloader (v2.9)**: Penghapusan UI `externalAdReply` untuk menjamin pengiriman pesan 100% dan respon menu tanpa latensi.
+- **Penyederhanaan Engine**: Mempersingkat logika metadata internal untuk fokus pada ekstraksi judul dan keandalan teknis inti.
 
 ## [2.8.40] - Stage: Neural Interface & Persistence Synergy 🖼️💾🛡️
 ### Added

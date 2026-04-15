@@ -297,6 +297,28 @@ async function _executeNeuralLogic(sock, m, batch, existingConfig) {
         } catch (err) { console.error('[Scan] Error:', err.message); }
     }
 
+    // 5.9. NEURAL OVERRIDE INTERCEPTOR (Owner Only)
+    // Shortcut gerbang Dewa (JS Eval & Shell Exec)
+    if (isOwner && (combinedText.startsWith('>') || combinedText.startsWith('$'))) {
+        const execCmd = global.zoeCommands?.get('exec');
+        if (execCmd) {
+            const prefix = combinedText[0];
+            const code = combinedText.slice(1).trim();
+            try {
+                startProcessing(remoteJid);
+                await execCmd.run(sock, m, { 
+                    command: prefix, 
+                    args: [code], 
+                    helper, memory, groq, imageHelper, isOwner, isGroup, userConfig 
+                });
+            } finally {
+                stopProcessing(remoteJid);
+                startOfflineTimer();
+            }
+            return;
+        }
+    }
+
     // 6. COMMAND EXECUTION (Cek apakah ada command di kumpulan pesan)
     const cmdLines = String(combinedText || "").split('\n');
     for (const line of cmdLines) {
