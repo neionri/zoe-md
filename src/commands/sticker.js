@@ -22,7 +22,8 @@ export default async (sock, m, { helper, groq, userConfig }) => {
 
     if (!isImage && !isVideo && !isViewOnce) {
         const refusal = await groq.getZoeDirective("User mau bikin stiker tapi nggak ngasih gambar atau video. Sindir dia biar pinteran sedikit kalo mo nyuruh AI.", remoteJid);
-        return await sock.sendMessage(remoteJid, { text: refusal }, { quoted: message });
+        await sock.sendMessage(remoteJid, { text: refusal }, { quoted: message });
+        throw new Error('User did not provide media for sticker');
     }
 
     // --- NEURAL TIER CHECK (v3.1.5) ---

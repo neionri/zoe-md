@@ -244,6 +244,22 @@ async function _executeNeuralLogic(sock, m, batch, existingConfig) {
     const isPrivate = !isGroup;
     const pushName = m.messages[0].pushName || 'Seseorang';
 
+    // 3.5 UNIVERSAL MAINTENANCE INTERCEPTOR (Neural Gate)
+    if (global.maintenanceMode && !isOwner) {
+        helper.coolLog('SECURITY', `Maintenance Intercept for ${participantJid}`);
+        try {
+            const zoeRejection = await groq.getZoeDirective(
+                `Boss sedang melakukan 'soul-surgery' (maintenance) pada raga gue. Kasih tau user kalau gue lagi sibuk/offline. Gunakan gaya bicara Zoe yang sarkas, elit, dingin, dan SINGKAT (Maksimal 1 kalimat). Usir mereka dengan gaya elit.`,
+                participantJid
+            );
+            await sock.sendMessage(remoteJid, { text: zoeRejection }, isGroup ? { quoted: m.messages[0] } : {});
+        } catch (e) {
+            await sock.sendMessage(remoteJid, { text: `⚠️ *Neural Matrix Offline*\nBoss lagi benerin raga gue. Lu tunggu aja.` });
+        }
+        startOfflineTimer();
+        return;
+    }
+
     // 4. VOICE TRANSCRIPTION (Jika ada audio)
     if (isAudio && audioBuffer) {
         try {
@@ -287,6 +303,8 @@ async function _executeNeuralLogic(sock, m, batch, existingConfig) {
         if (helper.isCommand(line)) {
             const { command, args } = helper.parseCommand(line);
             if (global.zoeCommands && global.zoeCommands.has(command)) {
+
+
                 // 6.1. LOCKDOWN FILTER (Stage 2.6.1 - Global & Local Check)
                 const globalConfig = await memory.getGroupConfig('GLOBAL');
                 const globalBanned = globalConfig.bannedCommands || [];
@@ -312,7 +330,19 @@ async function _executeNeuralLogic(sock, m, batch, existingConfig) {
                     startProcessing(remoteJid); 
                     await sock.sendPresenceUpdate('composing', remoteJid);
                     await cmd.run(sock, m, { command, args, helper, memory, groq, imageHelper, isOwner, isGroup, userConfig });
-                } catch (error) { console.error('Cmd Error:', error); }
+                    // ✅ Broadcast Command Success to Dashboard
+                    try {
+                        const { broadcastCommandLog } = await import('./func/dashboardServer.js');
+                        broadcastCommandLog({ user: participantJid.split('@')[0], command: `.${command}`, status: 'SUCCESS', reason: '' });
+                    } catch (_) {}
+                } catch (error) {
+                    helper.coolLog('SYSTEM', `Command Failed: ${error.message}`);
+                    // ❌ Broadcast Command Failure to Dashboard
+                    try {
+                        const { broadcastCommandLog } = await import('./func/dashboardServer.js');
+                        broadcastCommandLog({ user: participantJid.split('@')[0], command: `.${command}`, status: 'FAILED', reason: error.message || 'Unknown error' });
+                    } catch (_) {}
+                }
                 finally { 
                     stopProcessing(remoteJid); 
                     startOfflineTimer(); 

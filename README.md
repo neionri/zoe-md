@@ -36,7 +36,8 @@ Zoe didesain dengan filosofi **Centralized Neural Dispatcher**. Berbeda dengan b
 1.  **Synaptic Accumulator**: Mengumpulkan pesan dalam jendela waktu 3 detik (Debouncing). Ini mencegah spam balasan dan memungkinkan Zoe memahami konteks dari beberapa pesan sekaligus.
 2.  **Neural Gatekeeper (Bouncer)**: Lapisan keamanan yang memeriksa status ban permanen di MongoDB dan memantau aktifitas spam secara real-time.
 3.  **Command Dispatcher**: Sistem dinamis yang memuat perintah dari disk secara *on-the-fly* (Hot-Reload) tanpa perlu restart bot.
-4.  **Cognitive AI (Groq)**: Otak pusat yang melakukan sintesis respon, analisis visi, dan manajemen kepribadian.
+5.  **Neural Dashboard (Web Controller)**: Antarmuka monitoring berbasis web (Glassmorphism) untuk pemantauan log real-time dan kontrol kasta. Kini dilengkapi dengan **Settings Hub** untuk update Bio dan PFP secara instan. 💻✨
+6.  **Persistent Maintenance Gate**: Sistem proteksi global yang mengunci raga Zoe saat "soul-surgery" (maintenance). Status tersimpan di MongoDB dan memberikan respon AI sarkas untuk setiap interaksi user. 🛡️💾
 
 ---
 
@@ -152,6 +153,12 @@ Sistem keamanan mandiri yang terintegrasi dengan MongoDB:
 - **Memory Compression**: Zoe merangkum percakapan lama menjadi ringkasan sinaptik agar tidak memboroskan token API.
 - **Cognitive Facts**: Zoe menyerap informasi penting tentang Anda dan menyimpannya sebagai fakta permanen di raga digitalnya.
 
+### ⚙️ Persistent Maintenance Matrix
+Didesain untuk ketahanan operasional:
+- **Cloud Lock**: Status maintenance disimpan di MongoDB (`GLOBAL` target).
+- **Characterized Intercept**: Interupsi universal untuk seluruh sinyal masuk (Chat & Command) dengan respon AI berbasis kepribadian Zoe.
+- **Resilient State**: Tetap aktif sekalipun server bot mengalami restart atau upgrade raga.
+
 ---
 
 ## ⚙️ Configuration & Environment
@@ -160,10 +167,13 @@ Pastikan file `.env` Anda terisi dengan benar:
 
 | Key | Description |
 |---|---|
-| `GROQ_API_KEYS` | Kunci akses (Multi-key) ke otak AI Zoe (Groq Cloud). |
+| `GROQ_API_KEY` | Kunci akses ke otak AI Zoe (Groq Cloud). |
 | `MONGODB_URI` | Koneksi database untuk ingatan permanen. |
-| `OWNER_LID` | Identitas Master WA Anda. |
-| `OWNER_NAME` | Nama panggil Master Anda. |
+| `OWNER_NUMBER` | Nomor WhatsApp master Anda (Tanpa simbol). |
+| `PAIRING_NUMBER` | Nomor yang akan digunakan Zoe untuk login pertama kali. |
+
+> [!NOTE]
+> **Groq Rate Limits**: Jika Anda menggunakan akun Groq gratis, harap perhatikan batas panggilan API (RPM/TPM). Jika Anda melakukan spam percakapan terlalu cepat, Zoe mungkin akan mengalami error *Rate Limit* (429).
 
 ---
 
@@ -192,7 +202,13 @@ Zoe memiliki fitur interaktif di mana dia bisa mengirimkan foto dirinya sendiri 
 ### Cara Menyiapkan Identitas Visual Zoe:
 1. Buat folder baru bernama `zoe` di direktori utama proyek (`c:\wa\zoe`).
 2. Masukkan foto-foto pilihan Anda ke dalam folder tersebut (format `.jpg`, `.jpeg`, atau `.png`).
-3. Zoe akan secara otomatis melakukan pemotongan (*cropping*) cerdas untuk menyesuaikan aspek rasio WhatsApp (Landscape 1.91:1 atau Legacy Square).
+3. Zoe akan secara otomatis melakukan pemotongan (*cropping*) cerdas:
+    - **Landscape (1.91:1)**: Untuk pratinjau link eksternal.
+    - **Square (1:1)**: Untuk tampilan menu premium (`.help`) dan identitas visual utama.
+    - **Neural Signature**: Hasil olah `sharp` engine untuk kualitas HD.
+
+> [!CAUTION]
+> Jangan pernah membagikan isi folder `zoe` Anda jika folder tersebut berisi foto pribadi yang sensitif.
 
 ---
 

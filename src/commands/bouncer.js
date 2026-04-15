@@ -18,7 +18,8 @@ export default async function run(sock, m, { args, helper, memory, groq, isOwner
     // 1. Validasi: Harus di dalam grup
     if (!isGroup) {
         const res = await groq.getZoeDirective('Beri tahu user bahwa fitur bouncer cuma buat grup. Bilang dengan nada meremehkan.', remoteJid);
-        return sock.sendMessage(remoteJid, { text: res });
+        await sock.sendMessage(remoteJid, { text: res });
+        throw new Error('Command can only be used in groups');
     }
 
     // 2. Validasi: Harus Admin atau Owner
@@ -27,7 +28,8 @@ export default async function run(sock, m, { args, helper, memory, groq, isOwner
     
     if (!isAdmin && !isOwner) {
         const res = await groq.getZoeDirective('Ada user biasa sok asik mau nyuruh bouncer padahal dia bukan admin. Bacoti dia dengan sangat sarkas.', remoteJid);
-        return sock.sendMessage(remoteJid, { text: res });
+        await sock.sendMessage(remoteJid, { text: res });
+        throw new Error('Permission denied: requires admin');
     }
 
     const subCommand = args[0]?.toLowerCase();

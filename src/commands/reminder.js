@@ -20,7 +20,8 @@ export default async function run(sock, m, { args, helper }) {
     // 1. Validasi Input Dasar
     if (args.length < 1) {
         const jutekMsg = await groq.getZoeDirective('Beritahu user kalau dia harus kasih tau apa yang mau diingetin dan kapan. Contoh: .remindme 1 jam lagi angkat jemuran. SINGKAT & JUTEK.', remoteJid);
-        return await sock.sendMessage(remoteJid, { text: jutekMsg }, { quoted: m.messages[0] });
+        await sock.sendMessage(remoteJid, { text: jutekMsg }, { quoted: m.messages[0] });
+        throw new Error('User did not provide remindme arguments');
     }
 
     const userInput = args.join(' ');
@@ -32,7 +33,8 @@ export default async function run(sock, m, { args, helper }) {
 
     if (!result.success) {
         const errorMsg = await groq.getZoeDirective(`Kasih tau user kalau lu gagal ngerti waktunya. Alasan: ${result.error || 'Pola waktu aneh'}. Gaya lu yang paling nyebelin.`, remoteJid);
-        return await sock.sendMessage(remoteJid, { text: errorMsg }, { quoted: m.messages[0] });
+        await sock.sendMessage(remoteJid, { text: errorMsg }, { quoted: m.messages[0] });
+        throw new Error(`Failed to parse temporal intent: ${result.error || 'Unknown pattern'}`);
     }
 
     // 3. Simpan ke Database (Persistence)

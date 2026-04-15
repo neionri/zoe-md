@@ -15,6 +15,8 @@ import * as db from './func/db.js';
 import * as imageHelper from './func/imageHelper.js';
 import { incrementVersion, getVersion } from './func/versionManager.js';
 import { initNeuralScheduler } from './func/scheduler.js';
+import { initDashboard, setDashboardSock, broadcastLog } from './func/dashboardServer.js';
+import { setLogBroadcaster } from './func/helper.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -73,12 +75,19 @@ function validateNeuralPulse() {
  * Fungsi Utama (Start Engine)
  */
 async function start() {
-    // 0. Cek Integritas Lingkungan
+    // 0. Cek Integritas Lingkungan & Inisialisasi Dashboard
     validateNeuralPulse();
+    await initDashboard(process.env.PORT_DASHBOARD || 3000);
+    setLogBroadcaster(broadcastLog);
 
     // 1. Hubungkan ke Database MongoDB & Indeks Galeri Identitas
     await db.connectDB();
     await imageHelper.indexGallery(db);
+
+    // Bootstrap Maintenance Mode from Persistent State
+    const globalConfig = await db.getGroupConfig('GLOBAL');
+    global.maintenanceMode = !!globalConfig.maintenanceMode;
+    coolLog('SYSTEM', `Neural state loaded. Maintenance Mode: ${global.maintenanceMode ? 'ENABLED' : 'DISABLED'}`);
     
     // 2. Impor Message Handler secara dinamis (Awal)
     let messageHandlerModule = await import(`./messageHandler.js?t=${Date.now()}`);
@@ -110,6 +119,7 @@ async function start() {
     connectToWhatsApp((sock, m) => handleMessage(sock, m))
         .then((sock) => {
             console.log('\x1b[35m[Zoe]\x1b[0m Neural connection established.');
+            setDashboardSock(sock);
             
             // 5. Jalankan Penjaga Waktu (Scheduler)
             initNeuralScheduler(sock);

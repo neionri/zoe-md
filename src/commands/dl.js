@@ -10,7 +10,8 @@ export default async (sock, m, { args, helper, groq }) => {
 
     if (args.length === 0) {
         const errorRes = await groq.getZoeDirective('User mau download tapi pelit amat nggak bagi link. Sindir dia biar pinteran dikit.', remoteJid);
-        return await sock.sendMessage(remoteJid, { text: errorRes }, { quoted: m.messages[0] });
+        await sock.sendMessage(remoteJid, { text: errorRes }, { quoted: m.messages[0] });
+        throw new Error('User did not provide a URL');
     }
 
     const timestamp = Date.now();
@@ -21,7 +22,8 @@ export default async (sock, m, { args, helper, groq }) => {
 
     if (!platform) {
         const invalidRes = await groq.getZoeDirective(`User ngasih link yang Zoe nggak kenal: ${url}. Kasih tau link yang Zoe dukung cuma YouTube, TikTok, sama Instagram.`, remoteJid);
-        return await sock.sendMessage(remoteJid, { text: invalidRes }, { quoted: m.messages[0] });
+        await sock.sendMessage(remoteJid, { text: invalidRes }, { quoted: m.messages[0] });
+        throw new Error(`Unsupported platform for URL: ${url}`);
     }
 
     helper.coolLog('NETWORK', `Synapse Linked to ${platform}: ${url}`);

@@ -24,7 +24,8 @@ export default async function run(sock, m, { args, helper, groq }) {
 
     if (!targetText) {
         const errorMsg = await groq.getZoeDirective('Beritahu user kalau dia harus masukin teks yang mau diaudit atau reply pesan orang lain pake command ini. SINGKAT & JUTEK.', remoteJid);
-        return await sock.sendMessage(remoteJid, { text: errorMsg }, { quoted: m.messages[0] });
+        await sock.sendMessage(remoteJid, { text: errorMsg }, { quoted: m.messages[0] });
+        throw new Error('User did not provide text to audit');
     }
 
     // 2. Kirim ke Divisi Audit (Orpheus Specialist - Cold Logic)

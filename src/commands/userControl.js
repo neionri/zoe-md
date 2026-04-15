@@ -15,7 +15,8 @@ export const category = 'Owner';
 export default async function run(sock, m, { command, args, helper, isOwner }) {
     // 1. Otoritas Mutlak
     if (!isOwner) {
-        return await sock.sendMessage(helper.getSender(m), { text: `🙄 *Zoe Sarcasm*: Lu pikir lu siapa mau ngatur kasta orang? Cuma Boss gue yang bisa.` });
+        await sock.sendMessage(helper.getSender(m), { text: `🙄 *Zoe Sarcasm*: Lu pikir lu siapa mau ngatur kasta orang? Cuma Boss gue yang bisa.` });
+        throw new Error('Unauthorized access');
     }
 
     const remoteJid = helper.getSender(m);
@@ -27,7 +28,8 @@ export default async function run(sock, m, { command, args, helper, isOwner }) {
     }
 
     if (!target) {
-        return await sock.sendMessage(remoteJid, { text: `Tag orangnya atau tempel ID-nya boss. Contoh: .addprem 1400xxx atau .addprem @user 30` });
+        await sock.sendMessage(remoteJid, { text: `Tag orangnya atau tempel ID-nya boss. Contoh: .addprem 1400xxx atau .addprem @user 30` });
+        throw new Error('No target provided');
     }
 
     // Auto-Fix: Jika input ID mentah (tanpa @), asumsikan @lid sebagai default v3.2.2

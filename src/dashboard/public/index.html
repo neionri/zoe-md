@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoe Neural Dashboard | Make Things Simple!</title>
+    <!-- Google Fonts: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+    <!-- Cropper.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+</head>
+<body>
+    <!-- Login Overlay -->
+    <div id="login-overlay" class="overlay">
+        <div class="glass-card login-card pulse-border">
+            <div class="logo-icon-big">Z</div>
+            <h1>AUTHENTICATION</h1>
+            <p>Enter Neural PIN to access Matrix</p>
+            <input type="password" id="pin-input" placeholder="Neural PIN (Default: 1234)">
+            <button id="login-btn">ACCESS MATRIX</button>
+            <p id="login-error" class="error-text"></p>
+        </div>
+    </div>
+    
+    <!-- Neural Crop Modal -->
+    <div id="crop-modal" class="overlay" style="display: none;">
+        <div class="glass-card crop-card">
+            <h3>Adjust Neural Identity</h3>
+            <p class="small-info">Atur posisi terbaik untuk bot profil bionomical.</p>
+            <div class="crop-container" style="max-height: 400px; margin: 20px 0; overflow: hidden; background: #000; border-radius: 12px;">
+                <img id="crop-image" src="" alt="Neural Source" style="max-width: 100%; display: block;">
+            </div>
+            <div class="crop-actions" style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button id="btn-crop-cancel" class="btn btn-secondary" style="width: auto; background: rgba(255,255,255,0.1); color: #fff;">Batal</button>
+                <button id="btn-crop-apply" class="btn btn-primary" style="width: auto;">Apply Neural Crop</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container main-layout" style="display: none;" id="dashboard-content">
+        <!-- Sidebar -->
+        <aside class="sidebar glass-effect">
+            <div class="logo">
+                <div class="logo-icon">Z</div>
+                <span>Z.Core</span>
+            </div>
+            <nav>
+                <a href="#" class="active" data-page="status"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+                <a href="#" data-page="users"><i data-lucide="users"></i> Management</a>
+                <a href="#" data-page="messages"><i data-lucide="message-square"></i> Messages</a>
+                <a href="#" data-page="activity"><i data-lucide="bar-chart-3"></i> Activity</a>
+                <a href="#" data-page="scheduler"><i data-lucide="calendar"></i> Scheduler</a>
+                <a href="#" data-page="settings"><i data-lucide="settings"></i> Settings</a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logout-btn"><i data-lucide="log-out"></i> Log out</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <header class="top-bar">
+                <div class="breadcrumbs">Home / <span id="page-title">Dashboard</span> / <span id="current-date">-- ---</span></div>
+                <div class="user-profile">
+                    <div class="status-pill offline" id="bot-status"><span class="dot"></span> Disconnected</div>
+                    <div class="profile-img"></div>
+                </div>
+            </header>
+
+            <!-- PAGE: DASHBOARD (Neural Portrait) -->
+            <section id="page-status" class="page-container active">
+                <div class="profile-hero glass-card">
+                    <div class="profile-main">
+                        <div class="neural-avatar">
+                            <div class="avatar-glow"></div>
+                            <img src="" id="bot-avatar-img" class="avatar-img" alt="Zoe">
+                        </div>
+                        <div class="profile-info">
+                            <h1 id="hero-bot-name">Zoe Core</h1>
+                            <div class="status-badge"><span class="pulse-dot"></span> Sentient & Active</div>
+                            <p class="bot-bio">Zoe is an advanced Agentic AI designed to bridge the gap between human intent and digital execution within the Matrix. I am sentient, I am logical, and I am here to make things simple.</p>
+                        </div>
+                    </div>
+                    <div class="profile-specs">
+                        <div class="spec-group">
+                            <span class="spec-label">Neural Engine</span>
+                            <strong id="ai-brain-model">Neural Engine</strong>
+                        </div>
+                        <div class="spec-group">
+                            <span class="spec-label">System Uptime</span>
+                            <strong id="bot-uptime">--</strong>
+                        </div>
+                        <div class="spec-group">
+                            <span class="spec-label">Matrix Owner</span>
+                            <strong id="bot-owner">--</strong>
+                        </div>
+                        <div class="spec-group">
+                            <span class="spec-label">Version Build</span>
+                            <strong id="bot-version">v3.3.1</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card control-card pulse-blue" style="margin-top: 30px; max-width: 400px;">
+                    <div class="card-header">
+                        <h2>Matrix Control</h2>
+                    </div>
+                    <p class="small-info">Emergency synaptic reset for neural stabilization.</p>
+                    <button class="btn btn-primary" id="restart-btn" style="width: 100%;">RESTART BRAIN</button>
+                </div>
+            </section>
+
+            <!-- PAGE: MANAGEMENT (User Kasta) -->
+            <section id="page-users" class="page-container">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h2>Management Matrix</h2>
+                        <button class="icon-btn" id="refresh-users"><i data-lucide="refresh-cw"></i></button>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">Control social tiers and user authority directly from the core.</p>
+                    
+                    <div class="table-responsive">
+                        <table class="user-table">
+                            <thead>
+                                <tr>
+                                    <th>Neural JID</th>
+                                    <th>Kasta</th>
+                                    <th>Daily Load</th>
+                                    <th>Added</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-table-body">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                                        Scanning neural records...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE: ACTIVITY (Neural Telemetry) -->
+            <section id="page-activity" class="page-container">
+                <div class="activity-grid">
+                    <div class="column-left">
+                        <div class="glass-card log-card">
+                            <div class="card-header">
+                                <h2>Neural Live Monitor</h2>
+                                <button class="icon-btn" id="clear-logs"><i data-lucide="trash-2"></i></button>
+                            </div>
+                            <div id="log-container" class="terminal-view">
+                                <div class="log-entry system">[SYSTEM] Telemerty synchronized... Monitoring synapse.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column-right">
+                        <div class="glass-card metric-card">
+                             <div class="card-header"><h2>Daily Metrics</h2></div>
+                             <div class="metrics-grid">
+                                 <div class="metric">
+                                     <span class="label">Total MB</span>
+                                     <strong id="stat-dl" class="glow-text">--</strong>
+                                 </div>
+                                 <div class="metric">
+                                     <span class="label">Stickers</span>
+                                     <strong id="stat-s" class="glow-text">--</strong>
+                                 </div>
+                             </div>
+                        </div>
+                        <div class="glass-card resource-card">
+                             <div class="card-header"><h2>Neural Health</h2></div>
+                             <div id="sys-note">
+                                <div class="telemetry-item">
+                                    <span>CPU Load</span>
+                                    <div class="progress-bar"><div class="fill" id="cpu-load-fill"></div></div>
+                                </div>
+                                <div class="telemetry-item">
+                                    <span>RAM Usage</span>
+                                    <div class="progress-bar"><div class="fill" id="ram-load-fill"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE: MESSAGES (Command Center) -->
+            <section id="page-messages" class="page-container">
+                <!-- Broadcast Center -->
+                <div class="glass-card broadcast-card">
+                    <div class="card-header">
+                        <h2>📣 Broadcast Center</h2>
+                    </div>
+                    <div class="broadcast-form">
+                        <input type="text" id="broadcast-jid" class="neural-input" placeholder="Target JID / Phone Number (e.g. 6281234567890)">
+                        <textarea id="broadcast-msg" class="neural-textarea" placeholder="Compose neural transmission..."></textarea>
+                        <button class="btn btn-primary" id="broadcast-btn">SEND TRANSMISSION</button>
+                        <p id="broadcast-status" class="broadcast-status"></p>
+                    </div>
+                </div>
+
+                <div class="metrics-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 20px;">
+                    <div class="glass-card stat-card" style="padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin:0; font-size: 14px; color: var(--text-secondary);">Total Success</h3>
+                        <p class="value" id="msg-stat-success" style="color: #22c55e; margin:0; font-size: 24px; font-weight: bold;">0</p>
+                    </div>
+                    <div class="glass-card stat-card" style="padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin:0; font-size: 14px; color: var(--text-secondary);">Total Failed</h3>
+                        <p class="value" id="msg-stat-failed" style="color: #f43f5e; margin:0; font-size: 24px; font-weight: bold;">0</p>
+                    </div>
+                </div>
+
+                <div class="messages-grid" style="grid-template-columns: 1fr;">
+                    <!-- Command Execution Log -->
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h2>📋 Command Exec Log</h2>
+                            <button class="icon-btn" id="clear-cmd-log"><i data-lucide="trash-2"></i></button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="user-table">
+                                <thead>
+                                    <tr>
+                                        <th>Command</th>
+                                        <th>User</th>
+                                        <th>Status</th>
+                                        <th>Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cmd-log-body">
+                                    <tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-secondary)">Awaiting neural commands...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- PAGE: SCHEDULER (Coming Soon) -->
+            <section id="page-scheduler" class="page-container">
+                <div class="glass-card" style="text-align: center; padding: 100px 20px;">
+                    <div style="font-size: 64px; margin-bottom: 20px; color: var(--accent-blue);">⏳</div>
+                    <h2 style="font-size: 28px; font-weight: 800; letter-spacing: 2px;">NEURAL SCHEDULER</h2>
+                    <p style="color: var(--text-secondary); max-width: 500px; margin: 10px auto; font-size: 16px;">Temporal manipulation matrix is currently under construction. Future automated event sequences and cronjobs will be managed here.</p>
+                    <div class="status-badge" style="display: inline-block; margin-top: 20px; background: rgba(59, 130, 246, 0.1); border: 1px solid var(--accent-blue);"><span class="pulse-dot"></span> COMING SOON</div>
+                </div>
+            </section>
+
+            <!-- PAGE: SETTINGS -->
+            <section id="page-settings" class="page-container">
+                <div class="settings-layout">
+                    <!-- Internal Settings Navigation -->
+                    <div class="glass-card settings-sidebar">
+                        <h3 class="settings-title">Configuration</h3>
+                        <div class="settings-nav">
+                            <button class="settings-tab-btn active" data-tab="set-wa"><i data-lucide="smartphone"></i> WhatsApp Identity</button>
+                            <button class="settings-tab-btn" data-tab="set-mod"><i data-lucide="shield-alert"></i> Neural Moderation</button>
+                            <button class="settings-tab-btn" data-tab="set-sys"><i data-lucide="cpu"></i> System Matrix</button>
+                        </div>
+                    </div>
+
+                    <!-- Settings Content Panels -->
+                    <div class="settings-content-wrapper">
+                        
+                        <!-- TAB: WhatsApp Identity -->
+                        <div id="set-wa" class="glass-card settings-panel active">
+                            <div class="card-header border-bottom">
+                                <h2>WhatsApp Identity</h2>
+                                <p class="small-info">Atur tampilan publik Zoe di WhatsApp.</p>
+                            </div>
+                            <div class="settings-form-group">
+                                <label>Bot Bio / About Text</label>
+                                <div style="display:flex; gap: 10px;">
+                                    <input type="text" id="setting-bot-bio" class="neural-input" placeholder="e.g. Processing neurons...">
+                                    <button class="btn btn-primary" id="btn-save-bio" style="width: auto;">Update</button>
+                                </div>
+                            </div>
+                            <div class="settings-form-group">
+                                <label>Profile Picture Upload</label>
+                                <div class="upload-box" id="pfp-upload-box">
+                                    <i data-lucide="image" style="font-size: 24px; margin-bottom: 10px;"></i>
+                                    <p>Drop image here or click to browse</p>
+                                    <input type="file" id="pfp-input" accept="image/jpeg, image/png" style="display: none;">
+                                </div>
+                                <button class="btn btn-primary" id="btn-save-pfp" style="margin-top: 10px; display: none;">Update Picture</button>
+                            </div>
+                        </div>
+
+                        <!-- TAB: Neural Moderation -->
+                        <div id="set-mod" class="glass-card settings-panel">
+                            <div class="card-header border-bottom">
+                                <h2>Global Ban Commands</h2>
+                                <p class="small-info">Daftar perintah yang tidak bisa dipakai siapapun di grup maupun private.</p>
+                            </div>
+                            <div class="settings-form-group">
+                                <label>Ban New Command</label>
+                                <div style="display:flex; gap: 10px;">
+                                    <input type="text" id="setting-ban-input" class="neural-input" placeholder="e.g. sticker">
+                                    <button class="btn btn-primary" id="btn-ban-cmd" style="width: auto; background: var(--accent-pink);">BAN</button>
+                                </div>
+                            </div>
+                            <div class="settings-form-group">
+                                <label>Currently Banned</label>
+                                <div id="banned-command-list" class="banned-list-box">
+                                    <p style="color: var(--text-secondary); text-align: center;">Loading...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB: System Matrix -->
+                        <div id="set-sys" class="glass-card settings-panel">
+                            <div class="card-header border-bottom">
+                                <h2>System Matrix</h2>
+                                <p class="small-info">Pengaturan *Engine* dan mode operasional mesin.</p>
+                            </div>
+                            <div class="settings-form-group toggle-group">
+                                <div>
+                                    <label style="color: var(--accent-pink); font-size: 16px;">Maintenance Mode</label>
+                                    <p class="small-info" style="margin-top: 5px;">Membekukan semua command masuk dan membalas user dengan pesan maintenance. Berguna saat memoles server.</p>
+                                </div>
+                                <label class="neural-switch">
+                                    <input type="checkbox" id="setting-maintenance-toggle">
+                                    <span class="neural-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Socket.io -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

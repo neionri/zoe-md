@@ -52,9 +52,8 @@ export default async (sock, m, { args, helper, imageHelper, isOwner }) => {
         }
     });
 
-    // Ambil visual HD secara acak dari folder /zoe (Self-Host)
-    const thumbPath = await imageHelper.getRandomZoeLandscape();
-    const thumbnail = thumbPath ? fs.readFileSync(thumbPath) : null;
+    // Ambil visual 1:1 secara acak dari folder /zoe (Neural Signature)
+    const thumbPath = await imageHelper.getRandomZoeLegacySquare();
 
     // ReadMore: Trik untuk menyembunyikan menu di bawah tombol "Baca Selengkapnya"
     const readMore = String.fromCharCode(8206).repeat(4001);
@@ -78,24 +77,14 @@ export default async (sock, m, { args, helper, imageHelper, isOwner }) => {
 
     const finalMessage = `${menuText}\n${aiClosing}`;
     
-    // Authority Domain Masking: Link pengecoh agar cache WhatsApp di HP tidak nyangkut
-    const authorityDomains = ['google.com', 'pinterest.com', 'unsplash.com', 'github.com'];
-    const randomHost = authorityDomains[Math.floor(Math.random() * authorityDomains.length)];
-
-    await sock.sendMessage(remoteJid, { 
-        text: finalMessage,
-        contextInfo: {
-            externalAdReply: {
-                title: `🌸 ZOE NEURAL CORE v${getVersion()}`,
-                body: `System Response: 200 OK • Node: ${randomHost}`,
-                thumbnail: thumbnail,
-                jpegThumbnail: thumbnail,
-                sourceUrl: `https://zoe.${randomHost}`,
-                mediaType: 1, 
-                renderLargerThumbnail: true,
-                showAdAttribution: true,
-                containsAutoReply: true
-            }
-        }
-    }, { quoted: m.messages[0] });
+    // Kirim Menu sebagai Caption Foto (Ultra Premium & Clean)
+    if (thumbPath) {
+        await sock.sendMessage(remoteJid, { 
+            image: { url: thumbPath },
+            caption: finalMessage
+        }, { quoted: m.messages[0] });
+    } else {
+        // Fallback jika folder /zoe kosong
+        await sock.sendMessage(remoteJid, { text: finalMessage }, { quoted: m.messages[0] });
+    }
 };

@@ -8,6 +8,7 @@ const GroupConfigSchema = new mongoose.Schema({
     summary: { type: String, default: '' },
     facts: { type: Array, default: [] },
     bouncerMode: { type: Boolean, default: false },
+    maintenanceMode: { type: Boolean, default: false },
     bannedCommands: { type: Array, default: [] },
     lastPapTime: { type: Date },
     lastActive: { type: Date, default: Date.now }
@@ -52,6 +53,17 @@ const UserConfig = mongoose.model('UserConfig', UserConfigSchema);
 const ApiState = mongoose.model('ApiState', ApiStateSchema);
 const ZoeGallery = mongoose.model('ZoeGallery', ZoeGallerySchema);
 const Reminder = mongoose.model('Reminder', ReminderSchema);
+
+// Command Execution Log Schema
+const CommandLogSchema = new mongoose.Schema({
+    command:   { type: String, required: true },
+    user:      { type: String, required: true },
+    status:    { type: String, enum: ['SUCCESS', 'FAILED'], required: true },
+    reason:    { type: String, default: '' },
+    createdAt: { type: Date, default: Date.now, expires: 60 * 60 * 24 * 30 } // Auto-delete after 30 days
+});
+CommandLogSchema.index({ createdAt: -1 }); // Index for fast sorting
+const CommandLog = mongoose.model('CommandLog', CommandLogSchema);
 
 export async function connectDB() {
     if (mongoose.connection.readyState >= 1) return;
@@ -136,4 +148,33 @@ export async function getDueReminders() {
 
 export async function deleteReminder(id) {
     return await Reminder.findByIdAndDelete(id);
+}
+
+/**
+ * COMMAND LOG HELPERS (Analytics + Anti-Overflow)
+ * Maks 500 record. Otomatis hapus yang lama jika sudah penuh.
+ */
+const CMD_LOG_LIMIT = 500;
+
+export async function saveCommandLog(command, user, status, reason = '') {
+    try {
+        await CommandLog.create({ command, user, status, reason });
+        // Anti-overflow: Hapus yang paling lama jika melebihi batas
+        const total = await CommandLog.countDocuments();
+        if (total > CMD_LOG_LIMIT) {
+            const oldest = await CommandLog.find().sort({ createdAt: 1 }).limit(total - CMD_LOG_LIMIT).select('_id');
+            await CommandLog.deleteMany({ _id: { $in: oldest.map(d => d._id) } });
+        }
+    } catch (err) {
+        console.error('[DB] CommandLog save error:', err.message);
+    }
+}
+
+export async function getCommandStats() {
+    const [success, failed, recent] = await Promise.all([
+        CommandLog.countDocuments({ status: 'SUCCESS' }),
+        CommandLog.countDocuments({ status: 'FAILED' }),
+        CommandLog.find().sort({ createdAt: -1 }).limit(50).lean()
+    ]);
+    return { success, failed, recent };
 }

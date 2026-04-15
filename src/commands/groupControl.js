@@ -23,7 +23,8 @@ export default async function run(sock, m, { command, args, helper, isOwner, isG
     if (!isGroup) {
         // Konteks Private: Hanya Owner yang bisa kontrol (GLOBAL BAN)
         if (!isOwner) {
-            return await sock.sendMessage(remoteJid, { text: `🙄 *Zoe Sarcasm*: Lu mimpi apa semalem nyoba ngatur-ngatur gue di private? Balik sana ke emak lu.` });
+            await sock.sendMessage(remoteJid, { text: `🙄 *Zoe Sarcasm*: Lu mimpi apa semalem nyoba ngatur-ngatur gue di private? Balik sana ke emak lu.` });
+            throw new Error('Unauthorized access');
         }
         targetJid = 'GLOBAL'; // Masuk ke database internasioal
         authName = "Owner (Global)";
@@ -34,7 +35,8 @@ export default async function run(sock, m, { command, args, helper, isOwner, isG
         const isAdmin = admins.includes(participantJid);
 
         if (!isAdmin && !isOwner) {
-            return await sock.sendMessage(remoteJid, { text: `🛡️ *Zoe Access Denied*: Fitur ini cuma buat para kasta tinggi (Admin), bukan buat rakyat jelata kayak lu.` });
+            await sock.sendMessage(remoteJid, { text: `🛡️ *Zoe Access Denied*: Fitur ini cuma buat para kasta tinggi (Admin), bukan buat rakyat jelata kayak lu.` });
+            throw new Error('Permission denied: requires admin');
         }
     }
 
@@ -47,10 +49,14 @@ export default async function run(sock, m, { command, args, helper, isOwner, isG
     // 2. BAN COMMAND (.bcmd)
     if (command === 'bcmd') {
         const cmdToBan = args[0]?.toLowerCase()?.trim()?.replace(/^\./, '');
-        if (!cmdToBan) return await sock.sendMessage(remoteJid, { text: `Tentukan perintahnya boss. Contoh: .bcmd sticker` });
+        if (!cmdToBan) {
+            await sock.sendMessage(remoteJid, { text: `Tentukan perintahnya boss. Contoh: .bcmd sticker` });
+            throw new Error('No command provided to ban');
+        }
 
         if (bannedCommands.includes(cmdToBan)) {
-            return await sock.sendMessage(remoteJid, { text: `Perintah .${cmdToBan} udah masuk daftar cekal ${authName.toLowerCase()}, pikun ya?` });
+            await sock.sendMessage(remoteJid, { text: `Perintah .${cmdToBan} udah masuk daftar cekal ${authName.toLowerCase()}, pikun ya?` });
+            throw new Error('Command is already banned');
         }
 
         // Gunakan pendekatan immutable (Buat array baru) untuk memastikan database mendeteksi perubahan
@@ -64,10 +70,14 @@ export default async function run(sock, m, { command, args, helper, isOwner, isG
     // 3. UNBAN COMMAND (.ubcmd)
     if (command === 'ubcmd') {
         const cmdToUnban = args[0]?.toLowerCase()?.trim()?.replace(/^\./, '');
-        if (!cmdToUnban) return await sock.sendMessage(remoteJid, { text: `Mana perintah yang mau dibebasin? Contoh: .ubcmd sticker` });
+        if (!cmdToUnban) {
+            await sock.sendMessage(remoteJid, { text: `Mana perintah yang mau dibebasin? Contoh: .ubcmd sticker` });
+            throw new Error('No command provided to unban');
+        }
 
         if (!bannedCommands.includes(cmdToUnban)) {
-            return await sock.sendMessage(remoteJid, { text: `Perintah .${cmdToUnban} emang nggak dilarang di ${isGroup ? 'grup ini' : 'Global'}, lu mabok oli?` });
+            await sock.sendMessage(remoteJid, { text: `Perintah .${cmdToUnban} emang nggak dilarang di ${isGroup ? 'grup ini' : 'Global'}, lu mabok oli?` });
+            throw new Error('Command is not banned');
         }
 
         // Hapus dari array dengan filter

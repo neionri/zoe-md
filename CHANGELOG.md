@@ -2,14 +2,22 @@
 
 Semua perubahan syaraf dan evolusi sistem Zoe dicatat di sini.
 
-## [3.2.0] - Stage: Neural Response & Commercial Matrix 💰🚀⚡
+## [2.8.40] - Stage: Neural Interface & Persistence Synergy 🖼️💾🛡️
+### Added
+- **Persistent Maintenance Matrix**: Status maintenance kini dikunci ke **MongoDB** (GLOBAL document), menjamin ketahanan sistem biarpun server restart atau hot-reload.
+- **Characterized Rejection**: Universal Maintenance Gate yang menangkap semua sinyal (Chat & Command) dan membalasnya dengan narasi AI sarkas khas Zoe. 🎭🛡️
+- **Premium Help Interface**: Transformasi menu `.help` menjadi image-caption response dengan portret Zoe HD.
+- **Neural Portrait Engine**: Implementasi auto-crop 1:1 (Square) berbasis `sharp` untuk visual menu yang lebih elit dan modern.
+- **Settings Hub Integration**: Dashboard resmi untuk update Bio WhatsApp dan Foto Profil dengan fitur cropping CropperJS terintegrasi.
+
+## [2.8.0] - Stage: Neural Response & Commercial Matrix 💰🚀⚡
 ### Added
 - **Neural Priority Queue**: Sistem antrean global berbasis kasta (VIP > Premium > Free).
 - **Dynamic Debouncing**: Jendela observasi lebih cepat (1.5s) khusus untuk VIP.
 - **Manual Payment Gate**: Perintah `.langganan` untuk monetisasi manual via Owner.
 - **Enhanced Metering**: Tampilan rasio MB dan Stiker di `.me`.
 
-## [3.0.0-Beta] - Stage: Neural Tiering 🧬⚖️💎
+## [2.7.0-Beta] - Stage: Neural Tiering 🧬⚖️💎
 ### Added
 - **Neural Social Hierarchy**: Sistem kasta individu (Free, Premium, VIP) berbasis JID.
 - **Quota Management**: Limit harian Downloader (15MB Free / 200MB Premium / No Limit VIP).

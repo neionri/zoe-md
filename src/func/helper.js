@@ -105,6 +105,16 @@ export function getParticipant(m) {
  */
 export const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+let logBroadcaster = null;
+
+/**
+ * Set Broadcaster untuk log (v1.0 Dashboard Bridge)
+ * @param {function} fn - Fungsi pemancar log
+ */
+export function setLogBroadcaster(fn) {
+    logBroadcaster = fn;
+}
+
 /**
  * Premium Terminal Logger (No-Dependency Version)
  * Mencetak log ke terminal dengan warna menggunakan ANSI Escape Codes.
@@ -114,6 +124,11 @@ export const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
  */
 export function coolLog(type, message) {
     const time = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    // Stream ke dashboard jika aktif
+    if (logBroadcaster) {
+        logBroadcaster(type, message);
+    }
     
     // ANSI Color Codes
     const colors = {
