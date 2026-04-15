@@ -2,6 +2,14 @@
 
 Semua perubahan syaraf dan evolusi sistem Zoe dicatat di sini.
 
+## [2.9.15] - Stage: Neural Intake Stability & AI Persona Mastery 📽️🎭🛡️
+### Added
+- **Neural Authority Persona**: AI-Dynamic responses for Owner commands (`.addprem`, `.addvip`, `.delkasta`), eliminating all hardcoded sarcasm strings.
+- **Bot-Check Resilience**: Integrated `cookies.txt` support and optimized browser headers for YouTube/Instagram extraction.
+### Optimized
+- **Downloader Stability (v2.9)**: Removal of `externalAdReply` UI to guarantee 100% message delivery and zero-latency menu response.
+- **Engine Streamlining**: Simplified internal metadata logic to focus on title extraction and core technical reliability.
+
 ## [2.8.40] - Stage: Neural Interface & Persistence Synergy 🖼️💾🛡️
 ### Added
 - **Persistent Maintenance Matrix**: Status maintenance kini dikunci ke **MongoDB** (GLOBAL document), menjamin ketahanan sistem biarpun server restart atau hot-reload.

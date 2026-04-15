@@ -6,9 +6,10 @@ import crypto from 'crypto';
 /**
  * Picks a random image from the /zoe directory, crops it to the Official 1.91:1 ratio,
  * and returns the path to the temporary cropped image.
+ * @param {number} quality JPEG Quality (default 85)
  * @returns {Promise<string|null>} Path to the cropped image
  */
-export async function getRandomZoeLandscape() {
+export async function getRandomZoeLandscape(quality = 85) {
     const imagesDir = path.resolve('./zoe');
     const tempDir = path.resolve('./scratch/temp_visuals');
 
@@ -45,7 +46,7 @@ export async function getRandomZoeLandscape() {
         await image
             .resize(targetWidth, null) 
             .extract({ left: 0, top: topOffset, width: targetWidth, height: targetHeight })
-            .jpeg({ quality: 85, chromaSubsampling: '4:4:4' })
+            .jpeg({ quality: quality, chromaSubsampling: '4:4:4' })
             .toFile(outputPath);
 
         return outputPath;
@@ -57,9 +58,11 @@ export async function getRandomZoeLandscape() {
 }
 
 /**
- * Picks a random image from /zoe and crops it to a legacy square (200x200).
+ * Picks a random image from /zoe and crops it to a legacy square.
+ * @param {number} quality JPEG Quality (default 85)
+ * @param {number} targetSize Pixel size (default 600)
  */
-export async function getRandomZoeLegacySquare() {
+export async function getRandomZoeLegacySquare(quality = 85, targetSize = 600) {
     const imagesDir = path.resolve('./zoe');
     const tempDir = path.resolve('./scratch/temp_visuals');
 
@@ -87,7 +90,7 @@ export async function getRandomZoeLegacySquare() {
                 fit: 'cover',
                 position: 'center'
             })
-            .jpeg({ quality: 85, chromaSubsampling: '4:4:4' })
+            .jpeg({ quality: quality, chromaSubsampling: '4:4:4' })
             .toFile(outputPath);
 
         return outputPath;

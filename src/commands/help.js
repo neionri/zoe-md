@@ -77,14 +77,29 @@ export default async (sock, m, { args, helper, imageHelper, isOwner }) => {
 
     const finalMessage = `${menuText}\n${aiClosing}`;
     
-    // Kirim Menu sebagai Caption Foto (Ultra Premium & Clean)
+    // Ambil thumbnail Landscape untuk preview yang lebih lebar (Official 1.91:1)
+    let thumbnail = null;
     if (thumbPath) {
-        await sock.sendMessage(remoteJid, { 
-            image: { url: thumbPath },
-            caption: finalMessage
-        }, { quoted: m.messages[0] });
-    } else {
-        // Fallback jika folder /zoe kosong
-        await sock.sendMessage(remoteJid, { text: finalMessage }, { quoted: m.messages[0] });
+        // Karena thumbPath tadi square (dari line 56), kita ambil ulang yang landscape
+        const landscapePath = await imageHelper.getRandomZoeLandscape();
+        if (landscapePath && fs.existsSync(landscapePath)) {
+            thumbnail = fs.readFileSync(landscapePath);
+        }
     }
+
+    // Kirim Menu sebagai Teks dengan Link Preview Luxury (Standard WA Compatible)
+    await sock.sendMessage(remoteJid, { 
+        text: finalMessage,
+        contextInfo: {
+            externalAdReply: {
+                title: `ZOE CORE NEURAL v${getVersion()} ]`,
+                body: 'Autonomous Sentiment & Neural Commands',
+                mediaType: 1, 
+                renderLargerThumbnail: true,
+                thumbnail: thumbnail,
+                sourceUrl: 'https://zoe.assistant.my.id',
+                showAdAttribution: false // MATIKAN: Biar muncul di WA Biasa
+            }
+        }
+    }, { quoted: m.messages[0] });
 };

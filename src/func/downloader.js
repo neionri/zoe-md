@@ -1,6 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 
+// Path ke file cookies buat bypass bot check (YouTube)
+const cookiePath = path.resolve('./cookies.txt');
+
 // Store sessions globally to survive hot-reloads
 if (!global.dlSessions) {
     global.dlSessions = new Map();
@@ -28,10 +31,12 @@ export function detectPlatform(url) {
 /**
  * Inisialisasi Sesi Download
  */
-export function createSession(jid, url, platform) {
+export function createSession(jid, url, platform, metadata = {}) {
     global.dlSessions.set(jid, {
         url,
         platform,
+        title: metadata.title || 'Unknown Media',
+        thumbnail: metadata.thumbnail || 'https://img.icons8.com/clouds/200/download-from-cloud.png',
         timestamp: Date.now()
     });
 }
@@ -87,7 +92,8 @@ async function executeDownload(sock, m, url, type, helper, groq, userConfig) {
         await sock.sendMessage(remoteJid, { text: initRes }, { quoted: m.messages[0] });
         await sock.sendPresenceUpdate('composing', remoteJid);
 
-        const youtubedl = (await import('youtube-dl-exec')).default;
+        const { create } = await import('youtube-dl-exec');
+        const youtubedl = create('/usr/local/bin/yt-dlp');
 
         let flags = {
             output: `${outputBase}.%(ext)s`,
@@ -103,6 +109,10 @@ async function executeDownload(sock, m, url, type, helper, groq, userConfig) {
                 'Sec-Fetch-Mode:navigate'
             ]
         };
+
+        if (fs.existsSync(cookiePath)) {
+            flags.cookies = cookiePath;
+        }
 
         if (type === 'audio') {
             flags.extractAudio = true;

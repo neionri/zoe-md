@@ -3,7 +3,7 @@
  * SPECIALIST: Neural Health Monitor
  * --------------------------------------
  * Menampilkan status kesehatan jaringan saraf Zoe (Tier, Keys, Specialists)
- * dengan desain Enterprise yang dibekali link preview premium.
+ * dalam format pesan teks bersih tanpa link preview.
  */
 
 import { getVersion } from '../func/versionManager.js';
@@ -20,7 +20,7 @@ export default async (sock, m, { helper, groq, imageHelper }) => {
     
     // Ambil data status dari groq.js yang sudah disinkronisasi
     const statusText = await groq.getZoeBrainStatus();
-    
+
     // Ambil thumbnail visual HD secara acak dari folder /zoe
     let thumbnail = null;
     if (imageHelper) {
@@ -30,7 +30,7 @@ export default async (sock, m, { helper, groq, imageHelper }) => {
         }
     }
 
-    // Kirim Dashboard dengan Link Preview Premium (Enterprise Look)
+    // Kirim Dashboard sebagai pesan teks dengan Link Preview Premium (Optimized for Standard WA)
     await sock.sendMessage(remoteJid, { 
         text: statusText,
         contextInfo: {
@@ -39,10 +39,9 @@ export default async (sock, m, { helper, groq, imageHelper }) => {
                 body: 'Categorized Command & Neural Reference',
                 mediaType: 1, 
                 renderLargerThumbnail: true,
-                thumbnail: thumbnail, // Menggunakan thumbnail HD acak
+                thumbnail: thumbnail,
                 sourceUrl: 'https://zoe.assistant.my.id',
-                showAdAttribution: true,
-                containsAutoReply: true
+                showAdAttribution: false // MATIKAN: Biar muncul di WA Biasa
             }
         }
     }, { quoted: m.messages[0] });
