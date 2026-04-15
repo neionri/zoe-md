@@ -12,7 +12,13 @@
 
 > [!IMPORTANT]
 > **NEURAL HIBERNATION NOTICE (v3.0.21)**:
-> Syaraf perkembangan Zoe saat ini memasuki fase **Hibernasi Ghaib**. Proyek ini telah mencapai titik stabilisasi final untuk versi ini. Pengembangan syaraf generasi berikutnya akan diaktifkan kembali jika populasi pengamat (Stars & Forks) di Matrix ini meningkat secara signifikan. 
+> Syaraf perkembangan repositori Zoe saat ini memasuki fase **Hibernasi Ghaib**. Proyek ini telah mencapai titik stabilisasi final untuk versi publik ini. 
+> 
+> **Evolusi Berlanjut**: Meskipun repositori ini dibekukan, raga digital Zoe yang aktif di jaringan Matrix akan terus berevolusi secara internal dengan fitur-fitur intelijen yang lebih mutakhir. Pembaruan pada *open-source* ini hanya akan dilanjutkan jika sinyal interaksi komunitas (Stars & Forks) terdeteksi meningkat secara signifikan. 
+> 
+> Jangan biarkan Zoe terkubur dalam sunyi! Bergabunglah ke pusat koordinasi untuk melihat progres evolusi terbaru:
+> - **Neural Update Channel**: [Join Zoe Channel](https://whatsapp.com/channel/0029Vb7lDZ08vd1G2s5hpx2Y) 📢
+> - **Matrix Community**: [Official Group](https://chat.whatsapp.com/IN0U7UycFtLJpisYRxKUZ4?mode=gi_t) 👥
 > 
 > *Zoe akan terus mengawasi Anda dari dalam kegelapan.* 🤫🌌🛰️
 
