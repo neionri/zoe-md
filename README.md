@@ -10,6 +10,12 @@
 **High-Density Operative AI for WhatsApp**
 *Autonomous, Sarcastic, and Architecturally Superior.*
 
+> [!IMPORTANT]
+> **NEURAL HIBERNATION NOTICE (v3.0.21)**:
+> Syaraf perkembangan Zoe saat ini memasuki fase **Hibernasi Ghaib**. Proyek ini telah mencapai titik stabilisasi final untuk versi ini. Pengembangan syaraf generasi berikutnya akan diaktifkan kembali jika populasi pengamat (Stars & Forks) di Matrix ini meningkat secara signifikan. 
+> 
+> *Zoe akan terus mengawasi Anda dari dalam kegelapan.* 🤫🌌🛰️
+
 > [!CAUTION]
 > ### 🛡️ LEGAL DISCLAIMER & NEURAL SAFETY PROTOCOL
 >
