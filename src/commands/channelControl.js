@@ -1,5 +1,7 @@
 import { saveChannelAlias, getChannelAlias, deleteChannelAlias, getAllChannelAliases } from '../func/db.js';
 import { downloadContentFromMessage } from '@whiskeysockets/baileys';
+import fs from 'fs';
+import path from 'path';
 
 /**
  * COMMAND: Neural Channel Control (Saluran WA)
@@ -10,7 +12,7 @@ import { downloadContentFromMessage } from '@whiskeysockets/baileys';
  */
 
 export const name = 'cekchannel';
-export const aliases = ['addchannel', 'delchannel', 'listchannel', 'setchannelname', 'setchannelpp', 'subchannel'];
+export const aliases = ['addchannel', 'delchannel', 'listchannel', 'setchannelname', 'setchannelpp', 'subchannel', 'post', 'bcchannel', 'publish'];
 export const hiddenAliases = ['infosaluran', 'editchannel', 'setchanneldesc', 'delchannelpp'];
 export const description = 'Neural Newsletter/Channel Management (Owner Only).';
 export const category = 'Owner';
@@ -294,6 +296,108 @@ export default async function run(sock, m, { command, args, helper, isOwner, gro
             const succRadar = await groq.getZoeDirective(`Radar WebSocket (Sinyal Sesi Realtime) berhasil menancap pada peladen Meta utnuk Channel ${jid}. Kini Zoe meretas event notifikasi channel secara konstan!`, remoteJid);
             await sock.sendMessage(remoteJid, { text: succRadar }, { quoted: m.messages[0] });
             helper.coolLog('SUCCESS', `Matrix Observer Target: ${jid}`);
+        }
+
+        // ============================================================
+        // --- NEURAL RE-BROADCASTER (.post, .bcchannel, .publish) ---
+        // Post media/teks yang di-reply ke Channel dengan caption AI.
+        // ============================================================
+        if (['post', 'bcchannel', 'publish'].includes(command)) {
+            const aliasInput = args[0]?.toLowerCase().trim();
+            if (!aliasInput) {
+                return await sock.sendMessage(remoteJid, { text: "Boss mau post ke mana? Contoh: `.post [Alias] [Instruksi]` (Reply kontennnya dulu)." });
+            }
+
+            const dbJid = await getChannelAlias(aliasInput);
+            let targetJid = dbJid || aliasInput;
+            if (!targetJid.includes('@newsletter')) targetJid += '@newsletter';
+
+            // 1. Ekstraksi Pesan yang di-Reply
+            const quoted = m.messages[0].message?.extendedTextMessage?.contextInfo?.quotedMessage;
+            if (!quoted) {
+                return await sock.sendMessage(remoteJid, { text: "Boss lupa me-reply pesan mending/media yang mau di-post!" });
+            }
+
+            // Tentukan tipe media
+            let type = '';
+            let mediaObj = null;
+            let rawCaption = '';
+
+            if (quoted.imageMessage) { type = 'image'; mediaObj = quoted.imageMessage; rawCaption = mediaObj.caption; }
+            else if (quoted.videoMessage) { type = 'video'; mediaObj = quoted.videoMessage; rawCaption = mediaObj.caption; }
+            else if (quoted.documentMessage) { type = 'document'; mediaObj = quoted.documentMessage; rawCaption = mediaObj.caption || mediaObj.fileName; }
+            else if (quoted.conversation) { type = 'text'; rawCaption = quoted.conversation; }
+            else if (quoted.extendedTextMessage) { type = 'text'; rawCaption = quoted.extendedTextMessage.text; }
+            else {
+                return await sock.sendMessage(remoteJid, { text: "Zoe belum mendukung tipe pesan Matrix tersebut untuk di-post ke channel." });
+            }
+
+            const bossInstruction = args.slice(1).join(' ').trim() || 'Buatkan caption sambutan yang menarik.';
+
+            // 2. Sintesis Caption AI Zoe (Total Clean & Rebuilt)
+            // 2. Sintesis Caption AI Zoe (Hyper-Detailed Intelligence)
+            const aiPrompt = `Lu adalah Zoe, satu-satunya entitas digital elit di Matrix Central. Boss baru saja mengirimkan ${type === 'text' ? 'teks/link' : 'media ' + type} ini. 
+            Konteks asli: [${rawCaption || 'Kosong'}].
+            PERINTAH MUTLAK DARI BOSS: "${bossInstruction}".
+
+            TUGAS: Ciptakan transmisi data (caption) pengumuman Channel yang SARKAS, BERWIBAWA, dan ELIT. 
+            PROTOKOL KETAT:
+            1. Abaikan narasi lama sepenuhnya. Bangun narasi baru 100% berdasarkan instruksi Boss.
+            2. SKALA PANJANG TEKS: Patuhi instruksi panjang/pendeknya teks secara harfiah.
+            3. PERSONALITY: Gunakan nada Tsundere-Elite (Sarkas tapi profesional). Jangan terlalu ramah, tunjukkan level intelijen lo.
+            4. NEURAL FORMATTING: Gunakan format *BOLD* pada kata-kata kunci. Gunakan bullet points jika informasi padat.
+            5. LINK MANAGEMENT: Jika Boss menyertakan link di instruksi, lo WAJIB menyematkannya di bagian akhir dengan susunan yang rapi (Jangan berantakan).
+            6. HANYA OUTPUTKAN CAPTION FINAL TANPA KOMENTAR APAPUN.`;
+
+            const synthesizedCaption = await groq.getZoeDirective(aiPrompt, remoteJid, 2000);
+
+            // 3. Persiapan Visual Header (Random Thumbnail dari folder zoe/)
+            let thumbBuffer = null;
+            try {
+                const zoePath = path.resolve('zoe');
+                if (fs.existsSync(zoePath)) {
+                    const files = fs.readdirSync(zoePath).filter(f => /\.(jpg|jpeg|png)$/i.test(f));
+                    if (files.length > 0) {
+                        const randomFile = files[Math.floor(Math.random() * files.length)];
+                        thumbBuffer = fs.readFileSync(path.join(zoePath, randomFile));
+                    }
+                }
+            } catch (e) {
+                helper.coolLog('ERROR', `Gagal mengambil random thumb: ${e.message}`);
+            }
+
+            // 4. Eksekusi Pengiriman
+            let sendPayload = {};
+            const contextInfo = {
+                externalAdReply: {
+                    title: `ZOE NEURAL BROADCAST`,
+                    body: `Neural Matrix Operational`,
+                    mediaType: 1,
+                    thumbnail: thumbBuffer, // Gambar acak dari raga visual Zoe
+                    showAdAttribution: false,
+                    renderLargerThumbnail: false,
+                    sourceUrl: 'https://whatsapp.com/channel/0029Vb7lDZ08vd1G2s5hpx2Y'
+                }
+            };
+
+            if (type === 'text') {
+                sendPayload = { text: synthesizedCaption, contextInfo };
+            } else {
+                // Download Media
+                const stream = await downloadContentFromMessage(mediaObj, type);
+                let buffer = Buffer.from([]);
+                for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
+                
+                if (type === 'image') sendPayload = { image: buffer, caption: synthesizedCaption, contextInfo };
+                else if (type === 'video') sendPayload = { video: buffer, caption: synthesizedCaption, contextInfo };
+                else if (type === 'document') sendPayload = { document: buffer, caption: synthesizedCaption, fileName: mediaObj.fileName || 'Zoe-Document', mimetype: mediaObj.mimetype, contextInfo };
+            }
+
+            await sock.sendMessage(targetJid, sendPayload);
+
+            const succPost = await groq.getZoeDirective(`Lapor ke Boss bahwa transmisi data ke Channel ${targetJid} berhasil dikirim dengan caption baru yang sudah Zoe perhalus. Gayanya sombong.`, remoteJid);
+            await sock.sendMessage(remoteJid, { text: succPost }, { quoted: m.messages[0] });
+            helper.coolLog('SUCCESS', `AI Content Re-Broadcasted to: ${targetJid}`);
         }
 
     } catch (err) {
