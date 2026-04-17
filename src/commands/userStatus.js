@@ -44,12 +44,21 @@ export default async function run(sock, m, { command, args, helper, userConfig, 
     const userBenefit = benefits[tier];
     const roleTitle = isOwner ? '🛠️ SYSTEM ARCHITECT' : '👤 USER';
 
-    // Statistik Media (v3.1.5)
+    // Limit Media & AI Image
     const sPhoto = userConfig.dailyUsage?.get?.('stickerPhoto') || 0;
     const sVideo = userConfig.dailyUsage?.get?.('stickerVideo') || 0;
+    
+    // Ambil info dari obyek imgDaily yang dimasukkan bay imagine.js
+    const today = new Date().toISOString().split('T')[0];
+    const imgDailyObj = userConfig.imgDaily || { date: today, count: 0 };
+    // Jika beda hari, anggap 0
+    const imgUsage = (imgDailyObj.date === today) ? imgDailyObj.count : 0;
 
     const dispPLimit = limits[tier].photo;
     const dispVLimit = limits[tier].video;
+    // Limit imagine yang diset: free: 5, premium: 20, vip: Infinity
+    const imgLimitMap = { free: 5, premium: 20, vip: '∞' };
+    const maxImgLimit = isOwner ? '∞' : imgLimitMap[tier];
 
     let expiredInfo = '';
     if (userConfig.tier === 'premium' && userConfig.premiumUntil) {
@@ -77,6 +86,7 @@ export default async function run(sock, m, { command, args, helper, userConfig, 
 • *Download*: ${downloadMB.toFixed(2)} MB / ${userLimit} MB
 • *Sticker (P)*: ${sPhoto} / ${dispPLimit}
 • *Sticker (V)*: ${sVideo} / ${dispVLimit}
+• *AI Image*: ${imgUsage} / ${maxImgLimit}
     `.trim();
 
     // Tampilkan ID card HANYA untuk command profil

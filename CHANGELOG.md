@@ -2,6 +2,20 @@
 
 Semua perubahan syaraf dan evolusi sistem Zoe dicatat di sini.
 
+## [3.1.1] - Stage: Neural SysAdmin & Storage Mastery 🛠️📊📦
+### Added
+- **Remote File Manager (`.fm`)**: Sistem manipulasi server (VPS/STB) jarak jauh eksklusif Owner via WhatsApp.
+    - Navigasi direktori (`ls`), unduh file (`get`), dan penghapusan aman (`rm`).
+    - Fitur **Push/Upload** untuk kirim file dari HP langsung ke penyimpanan server.
+    - Fitur **Leech/Downloader** untuk menyedot file dari URL internet langsung ke server (Hemat paket data HP).
+- **Neural Storage Scraper (`.bersih`)**: Alat pembersih sampah otomatis yang mampu melibas cache stiker/VN dan mensterilkan file sesi Baileys yang basi (> 7 hari) tanpa risiko logout.
+- **Sistem Kuota AI Image**: Implementasi limit harian cerdas (Free 5x, Premium 20x, VIP Unlimited) terintegrasi dengan Mongoose.
+- **Dashboard Metrics Synergy**: Sinkronisasi data penggunaan AI Image ke antarmuka Web Dashboard secara real-time via Socket.io.
+### Optimized
+- **Universal Portability (Plug & Play)**: Migrasi seluruh jalur direktori *hardcoded* (`/mnt/data`) menjadi jalur dinamis berbasis lingkungan (*Host-Agnostic*).
+- **Mimetype Intelligence**: Implementasi detektor ekstensi otomatis pada pengiriman dokumen untuk mencegah konversi paksa `.bin` oleh WhatsApp.
+- **Security Rejection AI**: Upgrade respon penolakan akses perintah `isOwnerOnly` menggunakan sintesis Groq AI yang lebih tajam dan karakter-konsisten (Tanpa Emoji).
+
 ## [3.0.21] - Tahap: Penguasaan Antarmuka Global & Pertahanan Neural 🛰️🧤🕵️‍♂️
 ### Added
 - **Sistem Hidden Aliases**: Implementasi sistem "Kasta Alias" di `index.js` (Loader). Memisahkan *Sub-Fitur* (Terlihat) dari *Sinonim/Shortcut* (Tersembunyi) untuk estetika menu tingkat tinggi.

@@ -20,4 +20,5 @@ export default async (sock, m, { args, helper }) => {
     const response = await synthesizeCommandResult('ping', rawData, remoteJid);
     // Update pesan tadi
     await sock.sendMessage(remoteJid, { text: response, edit: key });
+
 };

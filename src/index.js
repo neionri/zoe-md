@@ -8,7 +8,7 @@
 import 'dotenv/config'; // Memuat variabel lingkungan dari .env
 import fs from 'fs';
 import path from 'path';
-import { coolLog } from './func/helper.js';
+import { coolLog, setNotifySock } from './func/helper.js';
 import { fileURLToPath } from 'url';
 import { connectToWhatsApp } from './connection/index.js';
 import * as db from './func/db.js';
@@ -120,12 +120,23 @@ async function start() {
         .then((sock) => {
             console.log('\x1b[35m[Zoe]\x1b[0m Neural connection established.');
             setDashboardSock(sock);
+            setNotifySock(sock); // Aktivasi Jalur NEB
             
             // 5. Jalankan Penjaga Waktu (Scheduler)
             initNeuralScheduler(sock);
         })
         .catch(err => console.error('\x1b[31m[Failed]\x1b[0m Initialization error:', err));
 }
+
+// PENJAGA SYARAF GLOBAL (NEB Final Defense)
+process.on('uncaughtException', (err) => {
+    coolLog('ERROR', `FATAL CRASH: ${err.message}`);
+    console.error(err);
+});
+
+process.on('unhandledRejection', (reason) => {
+    coolLog('ERROR', `UNHANDLED REJECTION: ${reason}`);
+});
 
 // Jalankan Mesin Utama
 start();

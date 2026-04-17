@@ -91,7 +91,6 @@ export async function handleMessage(sock, m) {
             const lastM = queue.lastM;
             global.neuralQueues.delete(remoteJid);
             
-            // Masukkan ke Antrean Prioritas Global alih-alih eksekusi langsung
             nQueue.enqueueNeuralTask({
                 remoteJid,
                 tier,
@@ -103,7 +102,7 @@ export async function handleMessage(sock, m) {
             });
 
         } catch (err) {
-            console.error('[NeuralAccumulator] Fatal Error:', err);
+            helper.coolLog('ERROR', `[NeuralAccumulator] Fatal Error: ${err.message}`, err);
             global.neuralQueues.delete(remoteJid);
         }
     }, debounceTime);
@@ -145,7 +144,7 @@ async function _executeNeuralLogic(sock, m, batch, existingConfig) {
             return;
         }
     } catch (e) {
-        console.error('Session Handler Error:', e);
+        helper.coolLog('ERROR', `Session Handler Error: ${e.message}`, e);
     }
 
     // 2. AGREGASI PESAN (Bentuk satu konteks utuh dari spam user)
@@ -223,6 +222,44 @@ async function _executeNeuralLogic(sock, m, batch, existingConfig) {
         global.commandsList = list;
         global.reloadCommands = false;
         helper.coolLog('SYSTEM', 'Neural commands synchronized.');
+
+        // NEB: Cek papan pengumuman modul yang gagal dimuat
+        if (global.failedModules && global.failedModules.length > 0) {
+            const failed = global.failedModules.splice(0);
+            
+            // Hitung isOwner lebih awal untuk keperluan NEB
+            const _participantNum = participantJid.split('@')[0].split(':')[0];
+            const _ownerNum = (process.env.OWNER_LID || '').replace(/[^\d]/g, '');
+            const _ownerLid = helper.jidNormalize(process.env.OWNER_LID);
+            const _isOwner = _participantNum === _ownerNum ||
+                             _participantNum.endsWith(_ownerNum.slice(-10)) ||
+                             _ownerNum.endsWith(_participantNum.slice(-10)) ||
+                             (_ownerLid && participantJid === _ownerLid);
+
+            try {
+                if (_isOwner) {
+                    // Laporan teknis lengkap untuk Boss
+                    const failedList = failed.map(f => `• *${f.file}*\n  _${f.message}_`).join('\n');
+                    await sock.sendMessage(remoteJid, {
+                        text: `🚨 *[NEURAL EMERGENCY]*\n\nZoe gagal memuat modul berikut:\n\n${failedList}\n\nSilakan perbaiki file tersebut Boss.`
+                    });
+                } else {
+                    // Pesan dinamis dari karakter Zoe untuk user biasa
+                    const failedNames = failed.map(f => f.file.replace('.js', '')).join(', ');
+                    let errMsg = `⚠️ Maaf, command ${failedNames} sedang gangguan teknis. Coba lagi nanti.`;
+                    try {
+                        const { synthesizeCommandResult } = await import('./func/groq.js');
+                        errMsg = await synthesizeCommandResult(
+                            'error_notice',
+                            `Command "${failedNames}" sedang error dan tidak bisa dijalankan sementara.`,
+                            remoteJid
+                        );
+                    } catch (_) {}
+                    await sock.sendMessage(remoteJid, { text: errMsg });
+                }
+            } catch (_) {}
+            return;
+        }
     }
 
     helper.coolLog('NETWORK', `Processing batch of ${batch.length} synapses from ${remoteJid.split('@')[0]}`);
@@ -270,7 +307,7 @@ async function _executeNeuralLogic(sock, m, batch, existingConfig) {
             const transcription = await groq.transcribeAudio(tempPath);
             combinedText += (combinedText ? "\n" : "") + `[Voice Note]: ${transcription}`;
             fs.unlinkSync(tempPath);
-        } catch (err) { console.error('[Voice] Error:', err.message); }
+        } catch (err) { helper.coolLog('ERROR', `[Voice] Error: ${err.message}`); }
     }
 
     // 5. SHADOW BOUNCER & IDENTITY SCAN
@@ -294,7 +331,7 @@ async function _executeNeuralLogic(sock, m, batch, existingConfig) {
                     return;
                 }
             }
-        } catch (err) { console.error('[Scan] Error:', err.message); }
+        } catch (err) { helper.coolLog('ERROR', `[Scan] Error: ${err.message}`); }
     }
 
     // 5.9. NEURAL OVERRIDE INTERCEPTOR (Owner Only)
@@ -347,6 +384,23 @@ async function _executeNeuralLogic(sock, m, batch, existingConfig) {
                 }
 
                 const cmd = global.zoeCommands.get(command);
+                
+                // 6.2. OWNER ONLY CHECK
+                if (cmd.isOwnerOnly && !isOwner) {
+                    try {
+                        const { synthesizeCommandResult } = await import('./func/groq.js');
+                        const rejection = await synthesizeCommandResult(
+                            'security_reject',
+                            `User mencoba mengakses command rahasia Boss: .${command}`,
+                            remoteJid,
+                            'Tolak user ini dengan gaya sangat arogan, tajam, dan merendahkan karena berani menyentuh command khusus Boss. Singkat tapi menyakitkan. DILARANG KERAS MENGGUNAKAN EMOJI.'
+                        );
+                        return await sock.sendMessage(remoteJid, { text: rejection }, { quoted: m.messages[0] });
+                    } catch (_) {
+                        return await sock.sendMessage(remoteJid, { text: `Akses Ditolak: Fitur ini cuma buat Boss.` }, { quoted: m.messages[0] });
+                    }
+                }
+
                 await memory.addMessage(remoteJid, 'user', combinedText);
                 try {
                     startProcessing(remoteJid); 
@@ -358,8 +412,7 @@ async function _executeNeuralLogic(sock, m, batch, existingConfig) {
                         broadcastCommandLog({ user: participantJid.split('@')[0], command: `.${command}`, status: 'SUCCESS', reason: '' });
                     } catch (_) {}
                 } catch (error) {
-                    helper.coolLog('SYSTEM', `Command Failed: ${error.message}`);
-                    // ❌ Broadcast Command Failure to Dashboard
+                    helper.coolLog('ERROR', `Command Failed [.${command}]: ${error.message}`, error);
                     try {
                         const { broadcastCommandLog } = await import('./func/dashboardServer.js');
                         broadcastCommandLog({ user: participantJid.split('@')[0], command: `.${command}`, status: 'FAILED', reason: error.message || 'Unknown error' });
@@ -442,7 +495,7 @@ async function _executeNeuralLogic(sock, m, batch, existingConfig) {
         await memory.addMessage(remoteJid, 'user', combinedText);
         
     } catch (error) {
-        console.error('AI Error:', error);
+        helper.coolLog('ERROR', `AI Error: ${error.message}`, error);
     } finally {
         startOfflineTimer();
     }

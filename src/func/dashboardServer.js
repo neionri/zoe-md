@@ -321,17 +321,25 @@ async function broadcastMetrics() {
         
         let totalMB = 0;
         let totalStickers = 0;
+        let totalAiImages = 0;
 
         users.forEach(u => {
             if (u.dailyUsage) {
                 totalMB += u.dailyUsage.get('downloadMB') || 0;
                 totalStickers += (u.dailyUsage.get('stickerPhoto') || 0) + (u.dailyUsage.get('stickerVideo') || 0);
             }
+            if (u.imgDaily) {
+                const today = new Date().toISOString().split('T')[0];
+                if (u.imgDaily.date === today) {
+                    totalAiImages += u.imgDaily.count || 0;
+                }
+            }
         });
 
         io.emit('metricsUpdate', {
             totalMB: totalMB.toFixed(2),
-            totalStickers: totalStickers
+            totalStickers: totalStickers,
+            totalAiImages: totalAiImages
         });
     } catch (err) {
         // Quiet fail untuk menghindari spam log jika DB belum siap

@@ -449,8 +449,10 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.on('metricsUpdate', (data) => {
             const dlEl = document.getElementById('stat-dl');
             const sEl  = document.getElementById('stat-s');
+            const imgEl = document.getElementById('stat-img');
             if (dlEl) dlEl.innerText = `${data.totalMB} MB`;
             if (sEl)  sEl.innerText  = `${data.totalStickers} Qty`;
+            if (imgEl) imgEl.innerText = `${data.totalAiImages || 0} Qty`;
         });
 
         // 4. Command Execution Log

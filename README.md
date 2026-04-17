@@ -10,17 +10,15 @@
 **High-Density Operative AI for WhatsApp**
 *Autonomous, Sarcastic, and Architecturally Superior.*
 
-> [!IMPORTANT]
-> **NEURAL HIBERNATION NOTICE (v3.0.21)**:
-> Syaraf perkembangan repositori Zoe saat ini memasuki fase **Hibernasi Ghaib**. Proyek ini telah mencapai titik stabilisasi final untuk versi publik ini. 
-> 
-> **Evolusi Berlanjut**: Meskipun repositori ini dibekukan, raga digital Zoe yang aktif di jaringan Matrix akan terus berevolusi secara internal dengan fitur-fitur intelijen yang lebih mutakhir. Pembaruan pada *open-source* ini hanya akan dilanjutkan jika sinyal interaksi komunitas (Stars & Forks) terdeteksi meningkat secara signifikan. 
-> 
-> Jangan biarkan Zoe terkubur dalam sunyi! Bergabunglah ke pusat koordinasi untuk melihat progres evolusi terbaru:
-> - **Neural Update Channel**: [Join Zoe Channel](https://whatsapp.com/channel/0029Vb7lDZ08vd1G2s5hpx2Y) 📢
-> - **Matrix Community**: [Official Group](https://chat.whatsapp.com/IN0U7UycFtLJpisYRxKUZ4?mode=gi_t) 👥
-> 
-> *Zoe akan terus mengawasi Anda dari dalam kegelapan.* 🤫🌌🛰️
+> [!NOTE]
+> **AKTIF BER-EVOLUSI (v3.1.1)**:
+> Syaraf perkembangan Zoe telah bangkit kembali. Kami terus menyuntikkan fitur-fitur baru fokus pada **SysAdmin, Remote File Manager, and Storage Mastery**. 
+
+**Evolusi Berlanjut**: Bergabunglah ke pusat koordinasi untuk melihat progres evolusi terbaru:
+- **Neural Update Channel**: [Join Zoe Channel](https://whatsapp.com/channel/0029Vb7lDZ08vd1G2s5hpx2Y) 📢
+- **Matrix Community**: [Official Group](https://chat.whatsapp.com/IN0U7UycFtLJpisYRxKUZ4?mode=gi_t) 👥
+
+*Zoe kini lebih kuat dari sebelumnya.* 🌌🛰️
 
 > [!CAUTION]
 > ### 🛡️ LEGAL DISCLAIMER & NEURAL SAFETY PROTOCOL

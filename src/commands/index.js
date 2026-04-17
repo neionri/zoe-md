@@ -33,7 +33,15 @@ export async function loadCommands() {
                 }
             }
         } catch (error) {
-            console.error(`Error loading command ${file}:`, error);
+            // Catat modul yang gagal ke papan pengumuman global
+            if (!global.failedModules) global.failedModules = [];
+            global.failedModules.push({ file, message: error.message });
+            try {
+                const { coolLog } = await import('../func/helper.js');
+                coolLog('ERROR', `Neural Link Failure [${file}]: ${error.message}`, error);
+            } catch (e) {
+                console.error(`Error loading command ${file}:`, error);
+            }
         }
     }
     

@@ -5,6 +5,9 @@
  * manajemen waktu, hingga logging terminal yang cantik.
  */
 
+import fs from 'fs';
+import path from 'path';
+
 /**
  * Parsing Command
  * Memisahkan awalan (prefix), nama perintah, dan argumen.
@@ -107,6 +110,17 @@ export const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 let logBroadcaster = null;
 
+// Menggunakan global agar state tetap bertahan meskipun modul helper di-import ulang (cache-busting)
+if (!global.zoeLogPath) global.zoeLogPath = path.join(process.cwd(), 'logs/neural_signals.jsonl');
+
+/**
+ * Set Notify Socket for NEB (Neural Emergency Broadcast)
+ * @param {Object} sock - Koneksi WA Socket
+ */
+export function setNotifySock(sock) {
+    global.zoeNotifySock = sock;
+}
+
 /**
  * Set Broadcaster untuk log (v1.0 Dashboard Bridge)
  * @param {function} fn - Fungsi pemancar log
@@ -122,7 +136,7 @@ export function setLogBroadcaster(fn) {
  * @param {string} type - Kategori log (SUCCESS, NETWORK, SYSTEM, dll).
  * @param {string} message - Isi pesan log.
  */
-export function coolLog(type, message) {
+export function coolLog(type, message, err = null) {
     const time = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
     // Stream ke dashboard jika aktif
@@ -146,6 +160,26 @@ export function coolLog(type, message) {
     const grey = '\x1b[90m';
     
     console.log(`${grey}[${time}]${reset} ${color}[${type}]${reset} ${message}`);
+
+    // LOGIC: Neural Signal Recording (Save errors to disk for evolution analysis)
+    // Radar ZEN: Menangkap tipe ERROR atau SYSTEM yang mengandung kegagalan
+    if (type === 'ERROR' || (type === 'SYSTEM' && /gagal|error|failed|crash/gi.test(message))) {
+        const logPath = global.zoeLogPath;
+        const logEntry = {
+            timestamp: new Date().toISOString(),
+            type,
+            message,
+            // Gunakan stack dari error asli jika ada, agar path file tepat sasaran
+            stack: err?.stack || new Error().stack
+        };
+        try {
+            const logDir = path.join(process.cwd(), 'logs');
+            if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+            fs.appendFileSync(logPath, JSON.stringify(logEntry) + '\n');
+        } catch (e) {
+            // Silently fail if logging disk is full/dead
+        }
+    }
 }
 
 /**
